@@ -1,0 +1,445 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Agregar Producto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Estilos para los textfields */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    textarea,
+    input[type="file"] {
+      border: 1px solid orange;
+      /* Bordes de color naranja */
+      border-radius: 10px;
+      /* Bordes redondeados */
+      padding: 8px;
+      /* Espaciado interno */
+      font-family: Tahoma, sans-serif;
+      /* Fuente Tahoma */
+      margin-bottom: 10px;
+      /* Espaciado entre campos */
+      width: 100%;
+      /* Ancho completo */
+      box-sizing: border-box;
+      /* Incluir el padding y el borde en el ancho total */
+    }
+
+    /* Efecto de brillo al pasar el mouse sobre los textfields */
+    input[type="text"]:hover,
+    input[type="password"]:hover,
+    input[type="email"]:hover,
+    textarea:hover,
+    input[type="file"]:hover {
+      box-shadow: 0 0 10px orange;
+      /* Sombra naranja alrededor del campo */
+    }
+
+    /* Estilos para el botón */
+    button {
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      background-color: orange;
+      color: white;
+      font-family: Tahoma, sans-serif;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      /* Transición suave */
+    }
+
+    /* Cambiar el color del botón al pasar el mouse */
+    button:hover {
+      background-color: #ff8c00;
+      /* Naranja más claro */
+    }
+
+    .container {
+      width: 50%;
+      margin: 0 auto;
+      padding: 20px;
+      border: 2px solid orange;
+      /* Borde de color naranja */
+      border-radius: 10px;
+      /* Bordes redondeados */
+      box-sizing: border-box;
+      /* Incluir el padding en el ancho total */
+      font-family: Tahoma, sans-serif;
+      transition: border-color 0.3s;
+      /* Transición suave para el color del borde */
+    }
+
+    /* Cambiar el color del borde al pasar el mouse */
+    .container:hover {
+      border-color: #ff8c00;
+      /* Naranja más claro */
+    }
+
+    /* Estilos para la ventana emergente */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 50%;
+      /* Puedes ajustar este valor según sea necesario */
+      max-width: 400px;
+      /* Opcional: para limitar el ancho máximo de la ventana */
+      height: auto;
+      /* O cualquier altura que desees */
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      text-align: center;
+      /* Para centrar el texto */
+      border-radius: 10px;
+      /* Ajusta el valor según el radio de los bordes que deseas */
+      padding: 20px;
+      /* Opcional: agrega un relleno para separar el contenido de los bordes */
+    }
+
+    Con estos cambio .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      border-radius: 10px;
+      width: 50%;
+      /* Anchura de la ventana emergente */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+
+    }
+
+    /* Botón para cerrar la ventana emergente */
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* Estilos adicionales para el formulario dentro de la ventana emergente */
+    #nuevaCategoriaForm {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #nuevaCategoriaForm label {
+      margin-bottom: 5px;
+    }
+
+    #nuevaCategoriaForm input[type="text"] {
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    #nuevaCategoriaForm button {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    #nuevaCategoriaForm button:hover {
+      background-color: #45a049;
+    }
+
+
+    /* Estilos para centrar el botón horizontalmente */
+    .BotonCat {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* height: 100vh; */
+    }
+
+    /* Estilos para la previsualización de la imagen */
+    #preview {
+      margin-top: 10px;
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+
+<body>
+  <div class="container">
+    <h1>Agregar Nuevo Producto</h1>
+
+    <form id="productoForm" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="fieldWrapper">
+        <label for="id_nombre">Nombre:</label>
+        {{ form.nombre }}
+        {{ form.nombre.errors }}
+      </div>
+
+      <div class="fieldWrapper">
+        <label for="id_marca">Marca:</label>
+        {{ form.marca }}
+        {{ form.marca.errors }}
+      </div>
+
+      <div class="fieldWrapper">
+        <label for="id_modelo">Modelo:</label>
+        {{ form.modelo }}
+        {{ form.modelo.errors }}
+      </div>
+
+      <div class="fieldWrapper">
+        <label for="id_descripcion">Descripción:</label>
+        {{ form.descripcion }}
+        {{ form.descripcion.errors }}
+      </div>
+
+      <div class="fieldWrapper">
+        <label for="id_precio">Precio:</label>
+        {{ form.precio }}
+        {{ form.precio.errors }}
+      </div>
+
+      <div class="fieldWrapper">
+        <label for="id_codigo">Código:</label>
+        {{ form.codigo }}
+        {{ form.codigo.errors }}
+      </div>
+
+      <div class="fieldWrapper">
+        <label for="id_imagen">Imagen:</label>
+        {{ form.imagen }}
+        {{ form.imagen.errors }}
+      </div>
+
+      <div class="fieldWrapper">
+        <label for="id_categoria">Categoría:</label>
+        <select name="categoria" id="id_categoria" class="form-control">
+          <!-- Opciones de categorías cargadas dinámicamente -->
+        </select>
+      </div>
+
+      <div class="fieldWrapper">
+        <label for="id_observaciones">Observaciones:</label>
+        {{ form.observaciones }}
+        {{ form.observaciones.errors }}
+      </div>
+
+      <div class="fieldWrapper">
+        <label for="id_especificaciones">Especificaciones:</label>
+        {{ form.especificaciones }}
+        {{ form.especificaciones.errors }}
+      </div>
+      <!-- Otros campos del formulario -->
+      <img id="preview" src="" alt="Vista previa de la imagen" />
+      <button type="submit">Guardar</button>
+    </form>
+
+
+<a href="{% url 'inicio' %}" class="regresar-button">Regresar al Menú</a>
+
+    <!-- Botón para abrir el modal -->
+    <br>
+    <div class="BotonCat">
+      <button id="nuevaCategoriaBtn">Crear Nueva Categoría</button>
+    </div>
+  </div>
+
+  <!-- Modal para agregar nueva categoría -->
+  <div id="nuevaCategoriaModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Agregar Nueva Categoría</h2>
+      <form id="nuevaCategoriaForm">
+        <label for="id_nueva_categoria">Nombre de la Categoría:</label>
+        <input type="text" id="id_nueva_categoria" name="nueva_categoria">
+        <button type="submit">Guardar</button>
+      </form>
+    </div>
+  </div>
+
+
+
+
+  <script>
+
+    $(document).ready(function () {
+      // Modal para agregar nueva categoría
+      var modal = document.getElementById("nuevaCategoriaModal");
+      var btn = document.getElementById("nuevaCategoriaBtn");
+      var span = document.getElementsByClassName("close")[0];
+
+      btn.onclick = function () {
+        modal.style.display = "block";
+      }
+
+      span.onclick = function () {
+        modal.style.display = "none";
+      }
+
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+
+      // Resto de tu código JS aquí...
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Función para mostrar una notificación Toasty
+    function mostrarNotificacion(mensaje, tipo) {
+      Toastify({
+        text: mensaje,
+        duration: 3000,
+        close: true,
+        backgroundColor: tipo === "success" ? "green" : "red",
+      }).showToast();
+    }
+
+    // Cargar categorías dinámicamente al cargar la página
+    $(document).ready(function () {
+      $.ajax({
+        url: "{% url 'cargar_categorias' %}",
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+          var options = '';
+          for (var i = 0; i < data.length; i++) {
+            options += '<option value="' + data[i].id + '">' + data[i].nombre + '</option>';
+          }
+          $('#id_categoria').append(options);  // Agregar opciones al select de categorías
+        },
+        error: function (xhr, errmsg, err) {
+          console.log(errmsg);
+        }
+      });
+    });
+
+    // Manejar el envío del formulario vía AJAX
+    $(document).ready(function () {
+      $("#productoForm").submit(function (event) {
+        event.preventDefault(); // Prevenir envío del formulario por defecto
+        var form = $(this);
+        var formData = new FormData(this); // Crear FormData para manejar la carga de archivos
+        $.ajax({
+          type: form.attr("method"),
+          url: form.attr("action"),
+          data: formData,
+          contentType: false,
+          processData: false,
+          success: function (response) {
+            if (response.success) {
+              mostrarNotificacion(response.message, "success");
+              form[0].reset(); // Limpiar el formulario después de éxito
+            } else {
+              mostrarNotificacion("Error al ingresar el producto", "error");
+            }
+          },
+          error: function () {
+            mostrarNotificacion("Error al conectar con el servidor", "error");
+          },
+        });
+      });
+    });
+
+
+    //Enviar las categorias al servidor
+    $(document).ready(function () {
+      $('#nuevaCategoriaForm').submit(function (event) {
+        event.preventDefault();
+        var nuevaCategoria = $('#id_nueva_categoria').val();
+        $.ajax({
+          type: 'POST',
+          url: '/crear_categoria/',  // Ajusta la URL según tu configuración de URL en Django
+          data: {
+            'nombre_categoria': nuevaCategoria,
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+          },
+          success: function (response) {
+            if (response.success) {
+              alert('Categoría creada correctamente');
+              // Aquí puedes realizar acciones adicionales después de crear la categoría
+              $('#id_categoria').append('<option value="' + response.id + '">' + response.nombre + '</option>');
+              $('#id_nueva_categoria').val(''); // Limpiar el campo del formulario modal
+            } else {
+              alert('Error al crear la categoría: ' + response.message);
+            }
+          },
+          error: function () {
+            alert('Error de red al intentar crear la categoría');
+          }
+        });
+      });
+    });
+
+    /// Previsualiza IMG
+    $(document).ready(function () {
+      // Mostrar previsualización de la imagen seleccionada
+      $('#id_imagen').on('change', function () {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $('#preview').attr('src', e.target.result);
+        }
+        reader.readAsDataURL(this.files[0]);
+      });
+    });
+
+
+  
+  </script>
+  
+</body>
+
+</html>

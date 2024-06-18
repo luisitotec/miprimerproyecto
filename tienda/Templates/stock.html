@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Stock</title>
+    <style>
+
+
+
+    .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid orange;
+        }
+
+        th {
+            background-color: orange;
+            color: white;
+            cursor: pointer;
+        }
+
+        th:hover {
+            background-color: darkorange;
+        }
+
+        .download-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: orange;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .download-button:hover {
+            background-color: darkorange;
+        }
+    </style>
+    <!-- Incluir jQuery desde CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <h1>Stock de Productos</h1>
+    <div>
+        <label for="search-input">Buscar:</label>
+        <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Ingrese término de búsqueda...">
+    </div>
+    <button class="download-button" onclick="exportToExcel()">Descargar en Excel</button>
+    <table id="table-to-export">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Stock</th>
+                <th>Ubicación</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% regroup existencias by ubicacion as ubicaciones_list %}
+            {% for ubicacion_group in ubicaciones_list %}
+            <tr>
+                <td colspan="4"><strong>{{ ubicacion_group.grouper }}</strong></td>
+            </tr>
+            {% for existencia in ubicacion_group.list %}
+            <tr>
+                <td>{{ existencia.producto.nombre }}</td>
+                <td>{{ existencia.cantidad }}</td>
+                <td>{{ existencia.ubicacion }}</td>
+                <td>{{ existencia.producto.precio }}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'inicio' %}" class="regresar-button">Regresar al Menú</a>
+
+    <!-- Incluir la biblioteca xlsx.js desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
+    <!-- Script para exportar a Excel y filtrar la tabla -->
+    <script>
+        // Función para exportar a Excel
+        function exportToExcel() {
+            const wb = XLSX.utils.table_to_book(document.getElementById('table-to-export'), { sheet: "Sheet JS" });
+            XLSX.writeFile(wb, 'reporte_excel.xlsx');
+        }
+
+        // Función para filtrar la tabla con jQuery
+        function filterTable() {
+            var searchText = $('#search-input').val().toLowerCase();
+            $('#table-to-export tbody tr').each(function () {
+                var rowText = $(this).text().toLowerCase();
+                if (rowText.includes(searchText)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle de venta</title>
+  <style>
+    /* Estilos generales para la página */
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      padding: 5px;
+    }
+
+
+    /* TABLA*************************************************************/
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  overflow: hidden; /* Asegura que los bordes redondos se muestren correctamente */
+}
+
+th, td {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 0; /* Resetea el borde redondeado de las celdas */
+}
+
+th {
+  background-color: orange; /* Fondo naranja para el encabezado */
+  color: black; /* Texto negro en el encabezado */
+}
+/* Aplica bordes redondeados solo a las esquinas de la tabla */
+table thead th:first-child {
+  border-top-left-radius: 10px;
+}
+
+table thead th:last-child {
+  border-top-right-radius: 10px;
+}
+
+table tbody td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+table tbody td:last-child {
+  border-bottom-right-radius: 10px;
+}
+
+
+    .header {
+      background-color: #f2f2f2;
+      padding: 10px 20px;
+      border: 2px solid black;
+      border-radius: 10px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    .info {
+      margin-bottom: 20px;
+    }
+
+    .info p {
+      margin: 5px 0;
+    }
+
+    .info p strong {
+      display: inline-block;
+      width: 180px;
+    }
+
+    .info p:last-child {
+      text-align: right;
+      margin-top: 10px;
+    }
+
+    .footer {
+      text-align: right;
+      margin-top: 10px;
+    }
+
+    .firmas {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .total {
+      margin-top: 20px;
+      text-align: right;
+    }
+
+    /* Estilo para el contenedor del campo Venta Total */
+    .venta-total-container {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      background: #f9f9f9;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    /* Estilo para el botón de impresión */
+    .print-button {
+      text-align: center;
+      margin-top: 20px;
+    }
+        /* Ocultar el botón de impresión en la versión impresa */
+    @media print {
+      .print-button {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="margin: 0;">DOCUMENTO N°{{ venta.id }}</h1>
+    </div>
+
+    <div class="info">
+      <p><strong>Código Factura:</strong> {{ venta.id }}</p>
+      <p><strong>Tipo de Operación:</strong> <span id="tipoOperacion">{{ venta.tipo_operacion }}</span></p>
+      <p><strong>Fecha:</strong> <span id="fecha">June 15, 2024</span></p>
+      <p><strong>Dirección:</strong> {{ venta.direccioncliente }}</p>
+      <p><strong>Municipio:</strong> {{ venta.municipio }}</p>
+      <p><strong>Departamento:</strong> {{ venta.departamento }}</p>
+      <p><strong>Registro:</strong> {{ venta.registro }}</p>
+      <p><strong>Documento:</strong> {{ venta.documentocliente }}</p>
+      <p><strong>Giro:</strong> {{ venta.giro }}</p>
+      <p><strong>Condiciones de Pago:</strong> <span id="condicionesPago">{{ venta.condicionesPago }}</span></p>
+    </div>
+
+    <table id="detalle-venta">
+      <thead>
+        <tr>
+          <th>Cantidad</th>
+          <th>Descripción</th>
+          <th>Precio Unitario</th>
+          <th>Vtas No Sujetas</th>
+          <th>Vtas Exentas</th>
+          <th>Ventas Grabadas</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for detalle in detalles %}
+        <tr>
+          <td>{{ detalle.cantidad }}</td>
+          <td>{{ detalle.producto.nombre }}</td>
+          <td>{{ detalle.precio_unitario }}</td>
+          <td class="ventas-no-sujetas"></td>
+          <td class="ventas-exentas"></td>
+          <td class="ventas-gravadas"></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="footer">
+      <p><strong>SUMAS:</strong> <span id="sumas"></span></p>
+      <p><strong>13% IVA:</strong> <span id="iva"></span></p>
+      <p><strong>SUB TOTAL:</strong> <span id="subtotal"></span></p>
+    </div>
+
+    <div class="firmas">
+      <div>
+        <p><strong>ENTREGADO POR:</strong> NOMBRE: _________________________ DUI: _________________ FIRMA: ________</p>
+      </div>
+      <div>
+        <p><strong>RECIBIDO POR:</strong> NOMBRE: _________________________ DUI: _________________ FIRMA: ________</p>
+      </div>
+    </div>
+
+    <!-- Contenedor para la Venta Total -->
+    <div class="venta-total-container">
+      <p><strong>Venta Total:</strong> <span id="ventaTotal"></span></p>
+    </div>
+
+    <!-- Botón para imprimir -->
+    <div class="print-button">
+      <button onclick="imprimirFactura()">Imprimir Factura</button>
+    </div>
+  </div>
+
+  <script>
+    // Función para cambiar las condiciones de pago
+    function cambiarCondicionesPago() {
+      const condicionesPagoElem = document.getElementById('condicionesPago');
+      if (condicionesPagoElem) {
+        let condicionesPago = condicionesPagoElem.innerText.trim().toLowerCase();
+
+        switch (condicionesPago) {
+          case 'contado':
+            condicionesPagoElem.innerText = 'VENTA DE CONTADO';
+            break;
+          case 'credito':
+          case 'crédito':
+            condicionesPagoElem.innerText = 'CRÉDITO';
+            break;
+          default:
+            // Opcional: Manejar un caso por defecto si no coincide con ninguno de los anteriores
+            break;
+        }
+      } else {
+        console.error('Elemento condicionesPago no encontrado en el DOM.');
+      }
+    }
+
+    // Llama a la función cuando el DOM esté cargado
+    document.addEventListener('DOMContentLoaded', function () {
+      cambiarCondicionesPago();
+      calcularTotales();
+    });
+
+
+    // Función para convertir el tipo de operación
+      function convertirTipoOperacion() {
+        const tipoOperacionElem = document.getElementById('tipoOperacion');
+        if (tipoOperacionElem) {
+          let tipoOperacion = tipoOperacionElem.innerText.trim().toUpperCase(); // Convertir a mayúsculas
+
+          switch (tipoOperacion) {
+            case 'CREDITO_FISCAL':
+              tipoOperacionElem.innerText = 'COMPROBANTE DE CRÉDITO FISCAL';
+              break;
+            case 'FAC_CONSUMIDOR_FINAL':
+              tipoOperacionElem.innerText = 'FACTURA';
+              break;
+            default:
+              console.error('Tipo de operación no reconocido:', tipoOperacion);
+              break;
+          }
+        } else {
+          console.error('Elemento tipoOperacion no encontrado en el DOM.');
+        }
+      }
+
+      // Llama a la función cuando el DOM esté cargado
+      document.addEventListener('DOMContentLoaded', function () {
+        convertirTipoOperacion();
+      });
+
+    // Función para calcular los totales
+    function calcularTotales() {
+      let sumas = 0;
+      let ventasGravadas = document.querySelectorAll('.ventas-gravadas');
+      ventasGravadas.forEach(function (element) {
+        let cantidad = parseFloat(element.parentElement.children[0].innerText);
+        let precioUnitarioStr = element.parentElement.children[2].innerText;
+        let precioUnitario = parseFloat(precioUnitarioStr.replace('$', '').trim());
+        let totalVentaGravada = cantidad * precioUnitario;
+        element.innerText = '$' + totalVentaGravada.toFixed(2);
+        sumas += totalVentaGravada;
+      });
+
+      let iva = sumas * 0.13;
+      let subtotal = sumas + iva;
+
+      document.getElementById('sumas').innerText = '$' + sumas.toFixed(2);
+      document.getElementById('iva').innerText = '$' + iva.toFixed(2);
+      document.getElementById('subtotal').innerText = '$' + subtotal.toFixed(2);
+
+      // Calcula y actualiza el campo "ventaTotal"
+      let ventaTotal = sumas + iva;
+      document.getElementById('ventaTotal').innerText = '$' + ventaTotal.toFixed(2);
+    }
+
+    // Función para imprimir la factura
+    function imprimirFactura() {
+      window.print();
+    }
+  </script>
+</body>
+
+</html>

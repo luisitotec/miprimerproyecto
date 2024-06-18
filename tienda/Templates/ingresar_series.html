@@ -1,0 +1,422 @@
+<!-- templates/ingresar_series.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Ingreso de Series</title>
+
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+  
+    h1 {
+      text-align: center;
+    }
+  
+    /* Estilos para la tabla de productos */
+    #productosTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+  
+    #productosTable th,
+    #productosTable td {
+      border: 1px solid orange;
+      padding: 8px;
+      text-align: left;
+    }
+  
+    #productosTable th {
+      background-color: orange;
+    }
+  
+    /* Estilos para el botón Seleccionar en la tabla */
+    #productosTable button {
+      padding: 5px 10px;
+      cursor: pointer;
+      background-color: orange;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+    }
+  
+    #productosTable button:hover {
+      background-color: rgb(15, 15, 15);
+    }
+  
+    /* Estilos para el formulario de ingreso de series */
+    form {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: orange;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  
+    form h2 {
+      margin-top: 0;
+    }
+  
+    form p {
+      margin-bottom: 10px;
+    }
+  
+    form label {
+      font-weight: bold;
+    }
+  
+    form input[type="text"],
+    form input[type="date"],
+    form select,
+    form textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      /* Para evitar que el padding incremente el ancho total */
+    }
+  
+    form button[type="submit"] {
+      padding: 10px 20px;
+      background-color: rgb(7, 7, 7);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  
+    form button[type="submit"]:hover {
+      background-color: orange;
+    }
+  
+    /* Estilos para el filtro de productos */
+    #productoFilter {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    /* Estilos CSS para el texto "Usuario" */
+        .username-container {
+            color: orange; /* Color naranja */
+            font-family: 'Tahoma', sans-serif; /* Fuente Tahoma */
+            animation: blink-animation 1s infinite; /* Animación de parpadeo */
+            text-align: left; /* Alinear a la izquierda */
+            margin-bottom: 20px; /* Margen inferior */
+        }
+
+        .username-container p {
+            font-size: 20px; /* Tamaño de fuente más grande */
+        }
+
+        @keyframes blink-animation {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+
+
+
+
+
+
+
+
+
+  </style>
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+
+
+</head>
+
+<body>
+  <h1>Ingreso de Series por Producto</h1>
+  <!-- Contenedor para aplicar estilos al texto "Usuario" -->
+  <div class="username-container">
+    <p>Operador de ingreso: {{ usuario }}</p>
+  </div>
+
+  <!-- Filtro de productos -->
+  <input type="text" id="productoFilter" onkeyup="filtrarProductos()" placeholder="Buscar producto por nombre..." />
+
+  <!-- Tabla de productos -->
+  <table id="productosTable">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Código</th>
+        <th>Precio</th>
+        <th>Seleccionar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for producto in productos %}
+      <tr>
+        <td>{{ producto.nombre }}</td>
+        <td>{{ producto.descripcion }}</td>
+        <td>{{ producto.codigo }}</td>
+        <td>{{ producto.precio }}</td>
+        <td>
+          <button type="button"
+            onclick="seleccionarProducto('{{ producto.id }}', '{{ producto.nombre }}', '{{ producto.descripcion }}', '{{ producto.codigo }}')">
+            Seleccionar
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Formulario para ingresar series -->
+  <form method="post" action="{% url 'ingresar_series' %}">
+    {% csrf_token %}
+    <h2>Producto Seleccionado</h2>
+    <p><strong>Código Producto:</strong> <span id="codigoProducto"></span></p>
+    <p>
+      <strong>Descripción del Producto:</strong>
+      <span id="descripcionProducto"></span>
+    </p>
+
+
+
+    <!-- CAMPOS NUEVOS AGREGADOS -->
+    <p>
+      <label for="proveedor">Proveedor:</label>
+      <select name="proveedor" id="proveedor" required>
+        <option value="">Seleccionar Proveedor</option>
+        {% for proveedor in proveedores %}
+        <option value="{{ proveedor.id }}">{{ proveedor.nombre }}</option>
+        {% endfor %}
+      </select>
+    </p>
+
+
+
+    <!-- Campos adicionales -->
+    <p><strong>Orden de Compra:</strong> <input type="text" name="orden_compra" /></p>
+    
+    
+    <p>
+      <strong>Número de Factura de Compra:</strong>
+      <input type="text" name="nfactura_compra" required />
+    </p>
+    
+    
+    
+    
+    
+    <p>
+      <strong>Observaciones:</strong><br>
+      <textarea name="observaciones" rows="5" cols="40"></textarea>
+    </p>
+
+
+
+    <!-- CODIGO DEL PRODUCTO -->
+    <input type="hidden" name="producto_id" id="productoId" />
+    <p><strong>Lote:</strong> <input type="text" name="lote" required /></p>
+
+
+
+
+    <!-- SUCURSAL -->
+    <p>
+      <label for="sucursal">Sucursal:</label>
+      <select name="sucursal" id="sucursal" required>
+        <option value="">Seleccionar Sucursal</option>
+        {% for sucursal in sucursales %}
+        <option value="{{ sucursal.id }}">{{ sucursal.nombre }}</option>
+        {% endfor %}
+      </select>
+    </p>
+
+
+
+    <p>
+      <strong>Fecha de ingreso al sistema:</strong>
+      <input type="date" name="fecha_ingreso" required />
+    </p>
+    
+    
+    
+  <p>
+    <strong>Números de Serie:</strong>
+    <textarea name="numeros_serie" id="numerosSerie" rows="5" cols="40" required></textarea>
+    <span id="errorNumSerie" class="error-message"></span>
+  </p>
+
+
+    <button type="submit">Guardar Series</button>
+
+<span id="errorSeleccionProducto" class="error-message"></span>
+
+
+  </form>
+  <a href="{% url 'inicio' %}" class="regresar-button">Regresar al Menú</a>
+
+  <script>
+    function seleccionarProducto(id, nombre, descripcion, codigo) {
+      document.getElementById("productoId").value = id;
+      document.getElementById("codigoProducto").innerText = codigo;
+      document.getElementById("descripcionProducto").innerText = descripcion;
+    }
+
+    function filtrarProductos() {
+      let input = document.getElementById("productoFilter");
+      let filter = input.value.toLowerCase();
+      let table = document.getElementById("productosTable");
+      let tr = table.getElementsByTagName("tr");
+      for (let i = 1; i < tr.length; i++) {
+        let td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+          let txtValue = td.textContent || td.innerText;
+          tr[i].style.display =
+            txtValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+        }
+      }
+    }
+
+
+
+/// Evitar el error but got
+
+  function seleccionarProducto(id, nombre, descripcion, codigo) {
+    document.getElementById("productoId").value = id;
+    document.getElementById("codigoProducto").innerText = codigo;
+    document.getElementById("descripcionProducto").innerText = descripcion;
+
+    // Habilitar el botón de guardar y limpiar mensajes de error
+    $("button[type='submit']").prop("disabled", false);
+    $("#errorSeleccionProducto").text("");
+  }
+
+  $(document).ready(function () {
+    // Validar el formulario antes de enviarlo
+    $("form").on("submit", function (event) {
+      // Verificar si se ha seleccionado un producto
+      if ($("#productoId").val() === "") {
+        // Evitar que el formulario se envíe
+        event.preventDefault();
+        // Mostrar mensaje de error y deshabilitar el botón de guardar
+        $("#errorSeleccionProducto").text("Debe seleccionar un producto de la tabla.");
+        $("button[type='submit']").prop("disabled", true);
+      }
+    });
+  });
+
+
+
+  // Función para validar números de serie duplicados
+  function checkDuplicates() {
+      let numerosSerieTextarea = $("#numerosSerie");
+      let numerosSerie = numerosSerieTextarea.val().trim();
+      let seriesArray = numerosSerie.split('\n').map(line => line.trim());
+      let uniqueSeries = new Set(seriesArray);
+
+      // Verificar si hay series duplicadas
+      if (seriesArray.length !== uniqueSeries.size) {
+        $("#errorNumSerie").text("No se permiten números de serie duplicados.");
+        $("button[type='submit']").prop("disabled", true); // Deshabilitar el botón
+      } else {
+        $("#errorNumSerie").text("");
+        $("button[type='submit']").prop("disabled", false); // Habilitar el botón
+      }
+    }
+
+    // Evento input para verificar duplicados en tiempo real
+    $("#numerosSerie").on("input", function () {
+      checkDuplicates();
+    });
+
+
+
+
+
+  $(document).ready(function () {
+    // Función para cargar el contenido inicial o actualizar por AJAX
+    function cargarInformacionUsuario() {
+      // Obtener el operador de ingreso del contenedor
+      var operador = $('#username-container p').text().trim().replace('Operador de ingreso: ', '');
+
+      // Objeto de datos a enviar al servidor
+      var data = {
+        'operador': operador  // Incluir el operador en los datos a enviar
+        // Puedes añadir más datos aquí si los necesitas
+      };
+
+      $.ajax({
+        url: 'ingresar_series/',  // Reemplaza con la URL de tu vista Django
+        type: 'POST',  // Cambiado a POST si estás enviando datos al servidor
+        dataType: 'json',
+        data: data,  // Pasar los datos al servidor
+        success: function (response) {
+          // Actualizar el contenido del contenedor con la respuesta AJAX
+          $('#username-container').html(response.html);
+        },
+        error: function (xhr, status, error) {
+          console.error('Error al cargar la información del usuario:', error);
+        }
+      });
+    }
+
+    // Llamar a la función al cargar la página
+    cargarInformacionUsuario();
+
+    // Puedes actualizar manualmente cuando sea necesario, por ejemplo, después de una acción específica
+    $('#actualizar-usuario-btn').click(function () {
+      cargarInformacionUsuario();
+    });
+  });
+
+
+
+
+
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,220 @@
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Seguimiento Venta</title>
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            /* Tamaño de fuente para toda la tabla */
+            border-radius: 10px;
+            /* Bordes redondos para la tabla */
+            overflow: hidden;
+            /* Para que los bordes redondos se vean correctamente */
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: orange;
+            /* Fondo naranja para los encabezados */
+            color: white;
+            /* Texto blanco para los encabezados */
+        }
+
+        /* Estilos para la ventana modal */
+        .modal {
+            display: none;
+            /* Inicialmente oculta */
+            position: fixed;
+            /* Posición fija en la ventana */
+            z-index: 1;
+            /* Por encima de todo */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            /* Permite hacer scroll */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Fondo negro semi-transparente */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            /* Fondo blanco */
+            margin: 15% auto;
+            /* Margen superior e inferior y centrado horizontal */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            /* Ancho de la ventana modal */
+        }
+
+        /* Estilos para el botón de cerrar */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+
+        
+        .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Seguimiento de Ventas - Monitoreo</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Número de Venta</th>
+                <th>Producto</th>
+                <th>Precio Unitario</th>
+                <th>Cantidad</th>
+                <th>Series Descargadas</th>
+                <th>Fecha de Venta</th>
+                <th>Cliente</th>
+                <th>Dirección</th>
+                <th>Departamento</th>
+                <th>Municipio</th>
+                <th>Giro</th>
+                <th>Documento del Cliente</th>
+                <th>Registro</th>
+                <th>Tipo de Operación</th>
+                <th>Condiciones de Pago</th>
+                <th>Método de Pago</th>
+                <th>Impuesto</th>
+                <th>Total de Venta</th>
+                <th>Acciones</th> <!-- Columna para el botón -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+            {% for detalle in venta.detalleventa_set.all %}
+            <tr>
+                {% if forloop.first %}
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.id }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ detalle.producto.nombre }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ detalle.precio_unitario }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ detalle.cantidad }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ detalle.series_vendidas }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.fecha }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.cliente }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.direccioncliente }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.departamento }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.municipio }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.giro }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.documentocliente }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.registro }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.get_tipo_operacion_display }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.condicionesPago }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.get_metodo_pago_display }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.impuesto }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">{{ venta.total }}</td>
+                <td rowspan="{{ venta.detalleventa_set.all|length }}">
+                    <button onclick="openModal('{{ venta.id }}')">Mostrar más información</button>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Ventana modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Detalles de la Venta</h2>
+            <p id="modal-content">Contenido detallado de la venta que se muestra aquí...</p>
+            <!-- Contenido adicional de la modal -->
+        </div>
+    </div>
+<a href="{% url 'inicio' %}" class="regresar-button">Regresar al Menú</a>
+    <script>
+      function openModal(ventaId) {
+            var modal = document.getElementById('myModal');
+            modal.style.display = 'block';
+
+            // Petición AJAX para obtener detalles de la venta
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        var venta = JSON.parse(xhr.responseText);
+                        // Actualizar contenido de la modal con los detalles de la venta
+                        var modalContent = document.getElementById('modal-content');
+                        modalContent.innerHTML = `
+                    <h2>Detalles de la Venta ${venta.id}</h2>
+                    <p><strong>Usuario:</strong> ${venta.vendedor}</p>
+                    <p><strong>Fecha:</strong> ${venta.fecha}</p>
+                    <p><strong>Monto Total:</strong> ${venta.total}</p>
+                    <p><strong>Tipo de Operación:</strong> ${venta.tipo_operacion}</p>
+                `;
+                    } else {
+                        console.error('Error al cargar detalles de la venta');
+                        // Puedes mostrar un mensaje de error o manejar el error de otra manera
+                    }
+                }
+            };
+            xhr.open('GET', `/detalles-venta-modal/${ventaId}/`); // URL ajustada para detalles_venta_modal
+            xhr.send();
+        }
+
+        function closeModal() {
+            var modal = document.getElementById('myModal');
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            var modal = document.getElementById('myModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

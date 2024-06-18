@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Emitir Reporte de Ventas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="date"] {
+            padding: 8px;
+            width: calc(50% - 10px);
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .btn-submit {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-submit:hover {
+            background-color: darkorange;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Emitir Reporte de Ventas</h1>
+        <form action="{% url 'generar_pdf_reporte_ventas' %}" method="GET">
+            <div class="form-group">
+                <label for="fecha_desde">Emitir reporte de ventas desde:</label>
+                <input type="date" id="fecha_desde" name="fecha_desde" required>
+            </div>
+            <div class="form-group">
+                <label for="fecha_hasta">hasta:</label>
+                <input type="date" id="fecha_hasta" name="fecha_hasta" required>
+            </div>
+            <button type="submit" class="btn-submit">Generar Reporte</button>
+        </form>
+    </div>
+</body>
+
+</html>

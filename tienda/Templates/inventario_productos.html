@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Inventario de Productos</title>
+    <style>
+           body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: orange;
+            color: white;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        th:first-child {
+            border-top-left-radius: 8px;
+        }
+
+        th:last-child {
+            border-top-right-radius: 8px;
+        }
+
+        table, th, td {
+            border-radius: 8px;
+        }
+
+        input[type="text"] {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: calc(100% - 22px);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: darkorange;
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+
+        
+        .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <h1>Inventario de Productos</h1>
+
+    <!-- Barra de búsqueda -->
+    <input type="text" id="searchInput" placeholder="Buscar en la tabla..."
+        style="margin-bottom: 10px; padding: 5px; width: 100%;">
+
+    <!-- Botón para exportar a Excel -->
+    <button id="exportButton" style="margin-bottom: 10px; padding: 10px;">Exportar a Excel</button>
+
+    <table id="inventoryTable">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Código</th>
+                <th>Stock</th>
+                <th>Precio Unitario</th>
+                <th>Ubicación</th>
+                <th>Proveedor</th>
+                <th>Fecha de Ingreso</th>
+                <th>Número de Serie</th>
+                <th>Lote</th>
+                <th>Número de Factura</th>
+                <th>Orden de Compra</th>
+                <th>Ingresado Por</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in inventario %}
+            <tr>
+                <td>{{ item.nombre }}</td>
+                <td>{{ item.codigo }}</td>
+                <td>{{ item.stock }}</td>
+                <td>{{ item.precio_unitario }}</td>
+                <td>{{ item.ubicacion }}</td>
+                <td>{{ item.proveedor }}</td>
+                <td>{{ item.fecha_ingreso }}</td>
+                <td>{{ item.numero_serie }}</td>
+                <td>{{ item.lote }}</td>
+                <td>{{ item.nfacturaCompra }}</td>
+                <td>{{ item.ordenCompra }}</td>
+                <td>{{ item.operador }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'inicio' %}" class="regresar-button">Regresar al Menú</a>
+
+    <script>
+        $(document).ready(function () {
+            // Filtro de búsqueda
+            $("#searchInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#inventoryTable tbody tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+
+            // Exportar a Excel
+            $("#exportButton").on("click", function () {
+                var table = document.getElementById("inventoryTable");
+                var wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+                XLSX.writeFile(wb, "inventario_productos.xlsx");
+            });
+        });
+    </script>
+</body>
+
+</html>

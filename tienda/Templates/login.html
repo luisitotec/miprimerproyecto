@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: 'Tahoma', Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .login-container {
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        form input[type="text"],
+        form input[type="password"],
+        form input[type="email"],
+        /* Estilo específico para el campo de correo electrónico */
+        form button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #ff8800;
+            border-radius: 5px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: 'Tahoma', Arial, sans-serif;
+            font-size: 16px;
+            box-sizing: border-box;
+            /* Para incluir el padding en el ancho total */
+        }
+
+        form input[type="text"]:focus,
+        form input[type="password"]:focus,
+        form input[type="email"]:focus {
+            /* Estilo de enfoque para el campo de correo electrónico */
+            border-color: #ffaa33;
+            outline: none;
+        }
+
+        form button {
+            background-color: #ff8800;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #ffaa33;
+        }
+
+        /* Ajuste específico para el campo de correo electrónico */
+        form input[type="email"] {
+            width: calc(100% - 22px);
+            /* Reducir el ancho para compensar el padding y el borde */
+        }
+    </style>
+</head>
+
+<body>
+<div class="login-container">
+    <h1>Ingresar al sistema</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="id_username">Usuario:</label>
+        <input type="text" id="id_username" name="username" required>
+        <label for="id_password">Contraseña:</label>
+        <input type="password" id="id_password" name="password" required>
+        <button type="submit">Iniciar sesión</button>
+    </form>
+</div>
+</body>
+
+</html>

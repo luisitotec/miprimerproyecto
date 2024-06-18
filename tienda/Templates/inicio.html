@@ -1,0 +1,132 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Panel de Operaciones</title>
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #ffaa33;
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos CSS para el texto "Usuario" */
+        .username-container {
+            color: orange;
+            font-family: 'Tahoma', sans-serif;
+            animation: blink-animation 1s infinite;
+            text-align: left;
+        }
+
+        .username-container p {
+            font-size: 20px;
+        }
+
+        @keyframes blink-animation {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="{% static 'images/alpha.png' %}" alt="Logo de Empresa" class="logo">
+        </div>
+
+        <h1>Panel de Operaciones</h1>
+        <!-- Mostrar nombre del usuario -->
+        <div class="username-container">
+            <p>Usuario: {{ usuario }}</p>
+        </div>
+        <div class="button-container">
+            <a href="{% url 'agregar_producto' %}" class="button">Agregar Productos</a>
+            <a href="{% url 'ingresar_series' %}" class="button">Ingreso de Series</a>
+            <a href="{% url 'crear_venta' %}" class="button">Facturacion Bajo Perfil</a>
+            <a href="{% url 'reporte_ventas' %}" class="button">Ventas</a>
+            <a href="{% url 'cliente_form' %}" class="button">Clientes</a>
+            <a href="{% url 'inventario_productos' %}" class="button">Inventario Productos</a>
+            <a href="{% url 'venta_masiva' %}" class="button">Facturacion Masiva</a>
+            <a href="{% url 'trazabilidad_series' %}" class="button">TRACE Rastreo de Series</a>
+            <a href="{% url 'lista_productos' %}" class="button">Catalogos</a>
+            <a href="{% url 'emitir_reporte_ventas' %}" class="button">Reporte de Ventas</a>
+            <a href="{% url 'stock_grupal' %}" class="button">Stock de Unidades</a>
+            <a href="{% url 'stock' %}" class="button">Stock por Sucursales</a>
+            <a href="{% url 'ingresar_proveedor' %}" class="button">Proveedores</a>
+            <a href="{% url 'registrar_usuario' %}" class="button">Usuarios</a>
+            <a href="{% url 'lista_clientes' %}" class="button">Base de Datos Clientes</a>
+            <!-- Formulario para cerrar sesión -->
+            <form action="{% url 'logout' %}" method="post" style="margin: 10px;">
+                {% csrf_token %}
+                <button type="submit" class="button">Cerrar Sesión</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

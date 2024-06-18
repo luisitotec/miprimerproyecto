@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Facturacion de bajo perfil</title>
+
+  <style>
+    h1,
+    h2 {
+      color: orange;
+      /* Color naranja */
+      font-family: 'Tahoma', sans-serif;
+      /* Fuente Tahoma */
+    }
+
+
+
+
+    #Prodcut-table-List {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-family: Tahoma, sans-serif;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #Prodcut-table-List thead {
+      background-color: #FF8C00;
+    }
+
+    #Prodcut-table-List th,
+    #Prodcut-table-List td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    #Prodcut-table-List th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      color: white;
+    }
+
+    #Prodcut-table-List tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    #Prodcut-table-List tr:hover {
+      background-color: #ddd;
+    }
+
+    #Prodcut-table-List button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #Prodcut-table-List button:hover {
+      background-color: #45a049;
+    }
+
+    /* Redondear las esquinas de la tabla */
+    #Prodcut-table-List thead th:first-child {
+      border-top-left-radius: 10px;
+    }
+
+    #Prodcut-table-List thead th:last-child {
+      border-top-right-radius: 10px;
+    }
+
+    #Prodcut-table-List tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 10px;
+    }
+
+    #Prodcut-table-List tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 10px;
+    }
+
+    #filtro-productos {
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid orange;
+      /* Borde con color naranja */
+      border-radius: 20px;
+      /* Bordes redondeados */
+      outline: none;
+      /* Quita el borde azul predeterminado al enfocar */
+      transition: border-color 0.3s ease;
+      /* Transición suave del color del borde */
+    }
+
+    #filtro-productos:focus {
+      border-color: #ff6600;
+      /* Cambia el color del borde al enfocar */
+    }
+
+
+
+    /* Estilos para el formulario de cabecera de venta */
+    .formulario-wrapper {
+      border: 2px solid #ffa500;
+      /* Borde de color naranja */
+      border-radius: 10px;
+      /* Bordes redondos */
+      padding: 20px;
+      max-width: 800px;
+      /* Ajusta el ancho máximo del formulario según sea necesario */
+      margin: auto;
+      /* Centra el formulario horizontalmente */
+      font-family: 'Tahoma', Arial, sans-serif;
+      /* Aplica la fuente Tahoma */
+      box-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
+      /* Sombra naranja */
+    }
+
+    .formulario-wrapper h2 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    /* Estilos para el formulario de cabecera de venta */
+    #venta-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      font-family: 'Tahoma', Arial, sans-serif;
+      /* Aplica la fuente Tahoma */
+    }
+
+    #venta-fields label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    #venta-fields select,
+    #venta-fields input[type="text"],
+    #venta-fields input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ffa500;
+      /* Borde de color naranja */
+      border-radius: 4px;
+      box-sizing: border-box;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      /* Transición para efectos hover */
+    }
+
+    #venta-fields select:focus,
+    #venta-fields input[type="text"]:focus,
+    #venta-fields input[type="date"]:focus {
+      outline: none;
+      /* Elimina el contorno al enfocar */
+      border-color: #ffa500;
+      /* Cambia el color del borde al enfocar */
+      box-shadow: 0 0 5px rgba(255, 165, 0, 0.5);
+      /* Efecto de sombra naranja */
+    }
+
+    #venta-fields select:hover,
+    #venta-fields input[type="text"]:hover,
+    #venta-fields input[type="date"]:hover {
+      border-color: #ffa500;
+      /* Cambia el color del borde al pasar el mouse */
+    }
+
+    /* Alineación específica para elementos en la segunda columna */
+    #venta-fields> :nth-child(even) {
+      text-align: right;
+    }
+
+
+
+
+    button[type="button"][onclick="facturarVenta()"] {
+      background-color: orange;
+      /* Color de fondo anaranjado */
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      /* Suaviza la transición */
+      box-shadow: 0 0 10px orange;
+      /* Sombra anaranjada */
+    }
+
+    button[type="button"][onclick="facturarVenta()"]:hover {
+      background-color: #ff6600;
+      /* Color más brillante al pasar el mouse */
+      box-shadow: 0 0 15px #ff6600;
+      /* Sombra anaranjada más pronunciada */
+    }
+
+
+    #total-venta {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: orange;
+      /* Color de fondo anaranjado */
+      color: white;
+      font-size: 24px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px orange;
+      /* Sombra anaranjada */
+      transition: all 0.3s ease;
+      /* Suaviza la transición */
+    }
+
+    #total-venta:hover {
+      background-color: #ff6600;
+      /* Color más brillante al pasar el mouse */
+      box-shadow: 0 0 15px #ff6600;
+      /* Sombra anaranjada más pronunciada */
+    }
+
+
+    .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* Estilo para la tabla del detalle de la venta */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Tahoma, sans-serif;
+    }
+
+    thead {
+      background-color: #FF8C00;
+      /* Fondo naranja */
+      color: white;
+      /* Texto negro */
+    }
+
+    th,
+    td {
+      border: 2px solid #FF8C00;
+      /* Bordes de color naranja */
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      font-family: Tahoma, sans-serif;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f2f2f2;
+      /* Color de fondo para filas pares */
+    }
+
+    table {
+      border-radius: 10px;
+      /* Bordes redondeados */
+      overflow: hidden;
+      /* Ocultar contenido desbordado */
+    }
+
+    table,
+    th,
+    td {
+      border: 2px solid #FF8C00;
+      /* Bordes de color naranja */
+    }
+
+
+
+    /* Barrra de carga */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+    }
+
+    .loader {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: white;
+    }
+
+    .loader-text {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .loader-bar {
+      width: 200px;
+      height: 20px;
+      background-color: #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .loader-progress {
+      width: 0;
+      height: 100%;
+      background-color: orange;
+      transition: width 0.3s ease-in-out;
+    }
+
+    /* Estilos CSS para el texto "Usuario" */
+        .username-container {
+            color: orange; /* Color naranja */
+            font-family: 'Tahoma', sans-serif; /* Fuente Tahoma */
+            animation: blink-animation 1s infinite; /* Animación de parpadeo */
+            text-align: left; /* Alinear a la izquierda */
+            margin-bottom: 20px; /* Margen inferior */
+        }
+
+        .username-container p {
+            font-size: 20px; /* Tamaño de fuente más grande */
+        }
+
+        @keyframes blink-animation {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+
+
+
+  </style>
+
+
+</head>
+
+<body>
+  <h1>Facturacion de bajo perfil</h1>
+      <!-- Contenedor para aplicar estilos al texto "Usuario" -->
+      <div class="username-container">
+        <p>Usuario: {{ usuario }}</p>
+      </div>
+
+  <input type="text" id="filtro-productos" onkeyup="filtrarProductos()" placeholder="Buscar por nombre..." />
+  <button type="button" onclick="facturarVenta()">Facturar productos masivamente</button>
+  <!-- Tabla de productos disponibles -->
+  <h2>Productos Disponibles</h2>
+  <div style="max-height: 400px; overflow-y: auto;">
+    <table id="Prodcut-table-List">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Código</th>
+          <th>Número de Serie</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for producto in productos %}
+        {% for existencia in producto.existencias %}
+        {% if existencia.estado == 'Disponible' %}
+        <tr id="producto-{{ existencia.id }}">
+          <td>{{ producto.nombre }}</td>
+          <td>{{ producto.descripcion }}</td>
+          <td>{{ producto.precio }}</td>
+          <td>{{ producto.codigo }}</td>
+          <td>{{ existencia.numero_serie }}</td>
+          <td>
+            <button id="seleccionar-{{ existencia.id }}"
+              onclick="seleccionarProducto('{{ producto.id }}', '{{ existencia.id }}')">Seleccionar Producto</button>
+          </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <br>
+
+
+  <!-- Formulario de cabecera de venta -->
+
+
+  <div class="formulario-wrapper">
+    <h2>Datos del cliente</h2>
+    <div id="formulario-venta">
+      <form method="post" id="venta-form">
+        {% csrf_token %}
+
+        <!-- Div contenedor para todos los campos -->
+        <div id="venta-fields" class="venta-fields">
+          <!-- Campo de Selección de Tipo de Operación -->
+          <label for="id_tipo_operacion">Tipo de Operación:</label>
+          <select id="id_tipo_operacion" name="tipo_operacion">
+            <option value="FAC_CONSUMIDOR_FINAL">Factura Consumidor Final</option>
+            <option value="CREDITO_FISCAL">Crédito Fiscal</option>
+          </select>
+
+          <!-- Campos generales de cabecera de venta -->
+          <label for="id_fecha">Fecha:</label>
+          <input type="date" id="id_fecha" name="fecha" value="{{ fecha_actual|date:'Y-m-d' }}" readonly>
+
+          <label for="id_cliente">Cliente:</label>
+          <input type="text" id="id_cliente" name="cliente">
+
+          <label for="id_documentocliente">Documento Cliente:</label>
+          <input type="text" id="id_documentocliente" name="documentocliente">
+
+          <label for="id_condicionesPago">Condiciones de Pago:</label>
+          <select id="id_condicionesPago" name="condicionesPago">
+            <option value="contado">Contado</option>
+            <option value="credito">Crédito</option>
+          </select>
+
+          <label for="id_direccioncliente">Dirección Cliente:</label>
+          <input type="text" id="id_direccioncliente" name="direccioncliente">
+
+          <label for="id_metodo_pago">Método de Pago:</label>
+          <select id="id_metodo_pago" name="metodo_pago">
+            <option value="Efectivo">Efectivo</option>
+            <option value="Tarjeta">Tarjeta</option>
+            <option value="Depósito Bancario">Depósito Bancario</option>
+            <option value="Giro">Giro</option>
+            <option value="Bitcoin">Bitcoin</option>
+          </select>
+
+          <!-- Campos específicos de Factura Consumidor Final -->
+          <label for="id_municipio">Municipio:</label>
+          <input type="text" id="id_municipio" name="municipio">
+
+          <label for="id_departamento">Departamento:</label>
+          <input type="text" id="id_departamento" name="departamento">
+
+          <label for="id_registro">Registro:</label>
+          <input type="text" id="id_registro" name="registro">
+
+          <label for="id_giro">Giro:</label>
+          <input type="text" id="id_giro" name="giro">
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+
+  <h2 id="total-venta">Total: $0.00</h2>
+
+  <br>
+  <br>
+
+
+
+
+  <!-- Tabla de detalle de venta -->
+  <h2>Detalle de Venta</h2>
+  <table id="Detalle-table-List">
+    <thead>
+      <tr>
+
+        <th>Codigo</th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Precio Unitario</th>
+        <th>Descuento</th>
+        <th>Impuesto</th>
+        <th>Números de Serie</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for detalle in detalles %}
+      <tr>
+
+        <td>{{ detalle.codigo }}</td>
+        <td>{{ detalle.producto }}</td>
+        <td>{{ detalle.cantidad }}</td>
+        <td>{{ detalle.precio_unitario }}</td>
+        <td>{{ detalle.descuento }}</td>
+        <td class="impuesto">0.00</td> <!-- Aquí se mostrará el impuesto calculado -->
+        <td>{{ detalle.series_vendidas|join:"<br>" }}</td>
+        <td>
+          <button onclick="eliminarFila(this)">Eliminar</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <br>
+
+  <!-- Botón para guardar/facturar la venta -->
+  <button type="button" onclick="facturarVenta()">Facturar</button>
+  <!-- Contenedor del overlay y la barra de carga -->
+  <div class="overlay" id="overlay">
+    <div class="loader">
+      <div class="loader-text">Registrando Venta...</div>
+      <div class="loader-bar">
+        <div class="loader-progress" id="loaderProgress"></div>
+      </div>
+    </div>
+  </div>
+
+<a href="{% url 'inicio' %}" class="regresar-button">Regresar al Menú</a>
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+  <script>
+
+
+    ////////Mendigo filtro /////////////
+
+
+    function filtrarProductos() {
+      var input, filtro, tabla, tr, td, i, txtValue;
+      input = document.getElementById("filtro-productos");
+      filtro = input.value.toUpperCase();
+      tabla = document.getElementById("Prodcut-table-List");
+      tr = tabla.getElementsByTagName("tr");
+
+      // Recorrer todas las filas de la tabla y ocultar las que no coincidan con el filtro
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0]; // El primer td contiene el nombre del producto
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filtro) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+
+
+
+    /// LOGICA DE SELECCION DE PRODUCTO /////////
+    document.addEventListener("DOMContentLoaded", function () {
+      const seriesPorProducto = {};
+
+      window.seleccionarProducto = function (productoId, existenciaId) {
+        const tableRows = document.querySelectorAll('#Prodcut-table-List tbody tr');
+
+        tableRows.forEach(row => {
+          if (row.id === `producto-${existenciaId}`) {
+            const nombre = row.cells[0].textContent;
+            const precio = row.cells[2].textContent;
+            const codigo = row.cells[3].textContent;
+            const serie = row.cells[4].textContent.trim();
+
+            // Agregar la serie al producto correspondiente
+            if (!seriesPorProducto[productoId]) {
+              seriesPorProducto[productoId] = [];
+            }
+            seriesPorProducto[productoId].push(serie);
+
+            // Verificar si la fila ya existe en el detalle de la venta
+            const detalleTable = document.getElementById("Detalle-table-List").getElementsByTagName("tbody")[0];
+            let existingRow = null;
+            for (let i = 0; i < detalleTable.rows.length; i++) {
+              if (detalleTable.rows[i].cells[1].textContent === nombre) {
+                existingRow = detalleTable.rows[i];
+                break;
+              }
+            }
+
+            if (existingRow) {
+              // Si la fila ya existe, incrementar la cantidad y actualizar el impuesto (IVA)
+              const cantidadCell = existingRow.cells[2];
+              const seriesCell = existingRow.cells[6];
+              const cantidad = parseInt(cantidadCell.textContent) + 1;
+              cantidadCell.textContent = cantidad;
+
+              // Actualizar las series vendidas
+              seriesCell.innerHTML += `<br>${serie}`;
+
+              // Calcular y actualizar el impuesto (IVA)
+              const precioUnitario = parseFloat(existingRow.cells[3].textContent);
+              const impuesto = cantidad * precioUnitario * 0.13;
+              existingRow.cells[5].textContent = impuesto.toFixed(2);
+
+            } else {
+              // Si la fila no existe, crear una nueva fila en el detalle de la venta
+              const newRow = detalleTable.insertRow();
+
+              newRow.innerHTML = `
+            <td>${codigo}</td>
+            <td>${nombre}</td>
+            <td>1</td>
+            <td>${precio}</td>
+            <td>0</td>
+            <td class="impuesto">0.00</td>
+            <td>${serie}</td>
+            <td><button onclick="eliminarFila(this, ${existenciaId})">Eliminar</button></td>
+          `;
+
+              // Calcular el impuesto (IVA) para la nueva fila
+              const impuesto = parseFloat(precio) * 0.13;
+              newRow.cells[5].textContent = impuesto.toFixed(2);
+            }
+
+            recalcularTotal()
+
+            // Deshabilitar el botón de seleccionar producto
+            document.getElementById(`seleccionar-${existenciaId}`).disabled = true;
+
+            // Actualizar el formset con las series separadas
+            const formsetContainer = document.getElementById('detalle-venta-formset');
+            const formRows = formsetContainer.getElementsByClassName('form-row');
+            let formRow = null;
+            for (let i = 0; i < formRows.length; i++) {
+              const productoInput = formRows[i].querySelector('input[name$="-producto"]');
+              if (productoInput && productoInput.value == productoId) {
+                formRow = formRows[i];
+                break;
+              }
+            }
+
+            if (formRow) {
+              // Si la fila del formset ya existe, actualizar el valor de las series
+              const seriesInput = formRow.querySelector('input[name$="-series_vendidas"]');
+              seriesInput.value = seriesPorProducto[productoId].join(',');
+            } else {
+              // Si la fila del formset no existe, agregar una nueva fila
+              const newFormHtml = `
+            <div class="form-row">
+              <input type="hidden" name="detalleventa_set-${formsetContainer.children.length}-producto" value="${productoId}">
+              <input type="hidden" name="detalleventa_set-${formsetContainer.children.length}-cantidad" value="1">
+              <input type="hidden" name="detalleventa_set-${formsetContainer.children.length}-precio_unitario" value="${precio}">
+              <input type="hidden" name="detalleventa_set-${formsetContainer.children.length}-descuento" value="0">
+              <input type="hidden" name="detalleventa_set-${formsetContainer.children.length}-impuesto" value="0">
+              <input type="hidden" name="detalleventa_set-${formsetContainer.children.length}-series_vendidas" value="${serie}">
+            </div>
+          `;
+              formsetContainer.insertAdjacentHTML('beforeend', newFormHtml);
+            }
+          }
+        });
+      };
+
+      window.eliminarFila = function (boton, existenciaId) {
+        const fila = boton.parentNode.parentNode;
+        const productoNombre = fila.cells[0].textContent;
+        const serieEliminada = fila.cells[6].textContent.trim();
+
+        // Eliminar la serie del registro correspondiente en seriesPorProducto
+        for (const productoId in seriesPorProducto) {
+          seriesPorProducto[productoId] = seriesPorProducto[productoId].filter(serie => serie !== serieEliminada);
+        }
+
+        // Eliminar la fila del detalle de la venta
+        fila.parentNode.removeChild(fila);
+
+        // Habilitar el botón de seleccionar producto
+        document.getElementById(`seleccionar-${existenciaId}`).disabled = false;
+
+        // Eliminar la fila correspondiente del formset
+        const formsetContainer = document.getElementById('detalle-venta-formset');
+        const formRows = Array.from(formsetContainer.getElementsByClassName('form-row'));
+        const index = formRows.findIndex(row => {
+          const serieInput = row.querySelector('input[name$="-series_vendidas"]');
+          return serieInput && serieInput.value.includes(serieEliminada);
+        });
+        if (index > -1) {
+          formRows[index].remove();
+        }
+
+        // Recalcular impuestos después de eliminar la fila
+        calcularImpuestos();
+      };
+
+      // Función para calcular el impuesto (IVA) dinámicamente
+      function calcularImpuestos() {
+        const filas = document.querySelectorAll('#Detalle-table-List tbody tr');
+        filas.forEach(fila => {
+          const cantidad = parseInt(fila.cells[2].textContent);
+          const precioUnitario = parseFloat(fila.cells[3].textContent);
+          const impuesto = cantidad * precioUnitario * 0.13;
+          fila.cells[5].textContent = impuesto.toFixed(2);
+        });
+      }
+    });
+
+
+
+    // Función para recalcular el total de la venta, incluyendo el IVA
+    function recalcularTotal() {
+      let total = 0;
+      const filas = document.querySelectorAll('#Detalle-table-List tbody tr');
+
+      filas.forEach(fila => {
+        const cantidad = parseInt(fila.cells[2].textContent);
+        const precio = parseFloat(fila.cells[3].textContent);
+        const descuento = parseFloat(fila.cells[4].textContent);
+        const impuesto = parseFloat(fila.cells[5].textContent);
+
+        const subtotal = (cantidad * precio) - descuento + impuesto;
+        total += subtotal;
+      });
+
+      // Mostrar el total en la interfaz
+      document.getElementById('total-venta').textContent = `Total: $${total.toFixed(2)}`;
+
+      // Actualizar el campo hidden del formulario con el total incluyendo el IVA
+      const totalConIVA = total.toFixed(2);  // Asegúrate de formatear el total correctamente
+      document.getElementById('id_total').value = totalConIVA;
+
+      return total;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function getCookie(name) {
+      const cookieValue = document.cookie.split('; ')
+        .find(row => row.startsWith(name + '='))
+        .split('=')[1];
+      return cookieValue ? decodeURIComponent(cookieValue) : null;
+    }
+
+    // Procesamiento de venta - Facturar
+    function facturar() {
+      const clienteElement = document.getElementById('id_cliente');
+      const fechaElement = document.getElementById('id_fecha');
+      const documentoclienteElement = document.getElementById('id_documentocliente');
+      const condicionesPagoElement = document.getElementById('id_condicionesPago');
+      const direccionclienteElement = document.getElementById('id_direccioncliente');
+      const metodo_pagoElement = document.getElementById('id_metodo_pago');
+      const municipioElement = document.getElementById('id_municipio');
+      const departamentoElement = document.getElementById('id_departamento');
+      const registroElement = document.getElementById('id_registro');
+      const giroElement = document.getElementById('id_giro');
+      const tipoOperacionElement = document.getElementById('id_tipo_operacion'); // Aquí obtienes el campo tipo_operacion
+
+
+      // Obtenemos el texto dentro del elemento con clase 'username-container'
+      const usuarioElement = document.querySelector('.username-container p');
+      const usuario = usuarioElement.textContent.trim(); // Obtiene el texto y lo limpia
+
+      // Ahora puedes usar la variable 'usuario' como necesites
+      console.log(usuario); // Imprime el usuario en la consola para verificar
+
+
+
+
+
+
+
+
+
+      if (!clienteElement || !fechaElement || !documentoclienteElement || !condicionesPagoElement || !direccionclienteElement || !metodo_pagoElement) {
+        console.error('No se encontraron todos los elementos necesarios para facturar.');
+        return;
+      }
+
+      const ventaData = {
+        tipo_operacion: tipoOperacionElement.value,
+        cliente: clienteElement.value,
+        fecha: fechaElement.value,
+        documentocliente: documentoclienteElement.value,
+        direccioncliente: direccionclienteElement.value,
+        condicionesPago: condicionesPagoElement.value,
+        metodo_pago: metodo_pagoElement.value,
+        municipio: municipioElement ? municipioElement.value : '',
+        departamento: departamentoElement ? departamentoElement.value : '',
+        registro: registroElement ? registroElement.value : '',
+        giro: giroElement ? giroElement.value : '',
+        estado: 'Completado',
+        vendedor: usuario  // Agrega el valor del usuario al objeto ventaData
+      };
+
+      const detallesData = [];
+      const filas = document.querySelectorAll('#Detalle-table-List tbody tr');
+      filas.forEach(fila => {
+        const codigoProducto = fila.cells[0].textContent;  // Código del producto
+        const nombreProducto = fila.cells[1].textContent;
+        const cantidad = parseInt(fila.cells[2].textContent);
+        const precioUnitario = parseFloat(fila.cells[3].textContent);
+        const descuento = parseFloat(fila.cells[4].textContent);
+        const impuesto = parseFloat(fila.cells[5].textContent);
+        const seriesHTML = fila.cells[6].innerHTML;
+        const series = seriesHTML.split('<br>').map(serie => serie.trim()); // Separar series y eliminar espacios
+
+        console.log('Capturado:', {
+          codigoProducto,  // Agregar código del producto al objeto capturado
+          nombreProducto,
+          cantidad,
+          precioUnitario,
+          descuento,
+          impuesto,
+          series
+        });
+
+        const detalle = {
+          codigo: codigoProducto,  // Usar código del producto en lugar de nombre
+          producto: nombreProducto,
+          cantidad: cantidad,
+          precio_unitario: precioUnitario,
+          descuento: descuento,
+          impuesto: impuesto,
+          series_vendidas: series
+        };
+
+        detallesData.push(detalle);
+
+        console.log('Detalle capturado:', detalle);
+      });
+
+      console.log('Detalles completos:', detallesData);
+
+
+
+
+
+      // Suponiendo que el total ya está calculado y mostrado en el HTML
+      const totalElement = document.getElementById('total-venta');
+      const totalText = totalElement.textContent; // Obtener el texto del elemento, por ejemplo "Total: $123.45"
+
+      // Extraer el número del texto, asumiendo el formato "Total: $X.XX"
+      const total = parseFloat(totalText.replace('Total: $', ''));
+
+      // Ahora puedes usar 'total' en tu objeto 'data' y en otras partes de tu código
+      console.log('Total:', total);
+      const data = {
+        venta: ventaData,
+        detalles: detallesData,
+        total: total
+      };
+
+
+
+      console.log('Datos para enviar:', data);
+
+      fetch('/crear_venta/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(data)
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error al enviar los datos al servidor');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Respuesta del servidor:', data);
+          window.location.href = `/venta/${data.venta_id}/`;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error al procesar la venta.');
+        });
+    }
+
+    // Botón para enviarlo todo
+    function facturarVenta() {
+      const clienteElement = document.getElementById('id_cliente');
+      const fechaElement = document.getElementById('id_fecha');
+      const documentoclienteElement = document.getElementById('id_documentocliente');
+      const condicionesPagoElement = document.getElementById('id_condicionesPago');
+      const direccionclienteElement = document.getElementById('id_direccioncliente');
+      const metodo_pagoElement = document.getElementById('id_metodo_pago');
+      const municipioElement = document.getElementById('id_municipio');
+      const departamentoElement = document.getElementById('id_departamento');
+      const registroElement = document.getElementById('id_registro');
+      const giroElement = document.getElementById('id_giro');
+      const tipoOperacionElement = document.getElementById('id_tipo_operacion'); // Aquí obtienes el campo tipo_operacion
+
+      // Verificar si algún campo de la cabecera está vacío
+      //if (!clienteElement.value.trim() || !fechaElement.value.trim() || !documentoclienteElement.value.trim() ||
+      //!condicionesPagoElement.value.trim() || !direccionclienteElement.value.trim() || !metodo_pagoElement.value.trim()) {
+      //alert('Debe completar todos los campos de la cabecera para hacer la venta.');
+      //return;
+      // }
+
+      const filas = document.querySelectorAll('#Detalle-table-List tbody tr');
+      if (filas.length === 0) {
+        alert('Debe agregar al menos un producto para hacer la venta.');
+        return;
+      }
+
+      facturar(); // Si todos los campos están completos, se procede con la facturación
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Mostrar mensaje de carga
+    mostrarMensajeCarga();
+
+    // Simulación de una solicitud POST al servidor (reemplaza esto con tu código real)
+    setTimeout(() => {
+      // Ocultar mensaje de carga después de un tiempo simulado (1 segundo)
+      ocultarMensajeCarga();
+
+      // Redirigir al detalle de la venta (simulación)
+      window.location.href = '/venta/12345/'; // Reemplaza con tu URL real
+    }, 9000); // Simula una carga de 1 segundo
+  }
+
+  function mostrarMensajeCarga() {
+    // Crear un elemento para el mensaje de carga
+    const mensajeCarga = document.createElement('div');
+    mensajeCarga.textContent = 'Registrando Venta... Enviando datos al servidor, Loading....';
+    mensajeCarga.style.position = 'fixed';
+    mensajeCarga.style.top = '50%';
+    mensajeCarga.style.left = '50%';
+    mensajeCarga.style.transform = 'translate(-50%, -50%)';
+    mensajeCarga.style.backgroundColor = 'rgba(255, 165, 0, 0.8)';
+    mensajeCarga.style.padding = '20px';
+    mensajeCarga.style.color = '#fff';
+    mensajeCarga.style.fontFamily = 'Arial, sans-serif';
+    mensajeCarga.style.fontSize = '18px';
+    mensajeCarga.style.borderRadius = '10px';
+    mensajeCarga.style.zIndex = '9999';
+    mensajeCarga.id = 'mensaje-carga';
+
+    // Agregar el mensaje de carga al cuerpo del documento
+    document.body.appendChild(mensajeCarga);
+  }
+
+  function ocultarMensajeCarga() {
+    // Buscar y eliminar el mensaje de carga
+    const mensajeCarga = document.getElementById('mensaje-carga');
+    if (mensajeCarga) {
+      mensajeCarga.parentNode.removeChild(mensajeCarga);
+    }
+
+    }
+
+
+
+  </script>
+</body>
+
+</html>

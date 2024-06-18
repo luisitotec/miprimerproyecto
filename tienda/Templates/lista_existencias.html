@@ -1,0 +1,44 @@
+<!-- templates/lista_existencias.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Lista de Existencias</title>
+</head>
+
+<body>
+  <h1>Inventario y trazabilidad</h1>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Número de Serie</th>
+        <th>Estado</th>
+        <th>Ubicación</th>
+        <th>Venta Asociada</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for existencia in existencias %}
+      <tr>
+        <td>{{ existencia.producto.nombre }}</td>
+        <td>{{ existencia.numero_serie }}</td>
+        <td>{{ existencia.estado }}</td>
+        <td>{{ existencia.ubicacion }}</td>
+        <td>
+          {% for detalle_venta in existencia.detalleventa_set.all %}
+          Venta {{ detalle_venta.venta.id }}
+          <br>
+          {% empty %}
+          No hay ventas asociadas
+          {% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+
+</html>
+
+</html>

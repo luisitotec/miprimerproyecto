@@ -1,0 +1,69 @@
+<form id="nuevaCategoriaForm" method="post" action="{% url 'crear_categoria' %}">
+    {% csrf_token %}
+    <label for="id_nombreCategoria">Nombre de la Categoría:</label>
+    <input type="text" id="id_nombreCategoria" name="nombreCategoria">
+    <button type="submit">Guardar</button>
+</form>
+
+<!-- Script para las notificaciones y la lógica de AJAX -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+    $(document).ready(function () {
+        $('#nuevaCategoriaForm').submit(function (event) {
+            event.preventDefault(); // Prevenir el envío del formulario por defecto
+            var nombreCategoria = $('#id_nombreCategoria').val(); // Obtener el nombre de la categoría
+
+            // Verificar si el campo de nombre de categoría está vacío
+            if (!nombreCategoria.trim()) {
+                // Mostrar notificación de error si el campo está vacío
+                Toastify({
+                    text: "Por favor ingresa un nombre para la categoría",
+                    duration: 3000,
+                    close: true,
+                    backgroundColor: "red",
+                }).showToast();
+                return; // Detener el envío del formulario si el campo está vacío
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '{% url "crear_categoria" %}',
+                data: {
+                    'nombreCategoria': nombreCategoria,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.success) {
+                        // Mostrar notificación de éxito
+                        Toastify({
+                            text: "¡Categoría guardada correctamente!",
+                            duration: 3000,
+                            close: true,
+                            backgroundColor: "green",
+                        }).showToast();
+                        // Limpiar el formulario después de guardar la categoría
+                        $('#nuevaCategoriaForm')[0].reset();
+                    } else {
+                        // Mostrar notificación de error
+                        Toastify({
+                            text: "Error al guardar la categoría",
+                            duration: 3000,
+                            close: true,
+                            backgroundColor: "red",
+                        }).showToast();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error en la solicitud:', error);
+                    // Mostrar notificación de error si hay un problema de conexión
+                    Toastify({
+                        text: "Error en la solicitud, por favor intenta nuevamente",
+                        duration: 3000,
+                        close: true,
+                        backgroundColor: "red",
+                    }).showToast();
+                }
+            });
+        });
+    });
+</script>

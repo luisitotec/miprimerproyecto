@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Productos</title>
+    <style>
+  /* Estilos generales */
+        body {
+            font-family: Tahoma, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: orange;
+            color: white;
+        }
+
+        .product-image {
+            max-width: 100px;
+            max-height: 100px;
+        }
+
+        /* Estilos para botones */
+        .generate-catalog-button,
+        .generate-catalog-buttonCat {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: orange;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .generate-catalog-button:hover,
+        .generate-catalog-buttonCat:hover {
+            background-color: darkorange;
+        }
+
+        .search-input {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .product-image {
+            max-width: 100px;
+            max-height: 100px;
+        }
+
+
+               /* Estilos para la caja de búsqueda */
+        #searchInput {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 25%;
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: 2px solid orange;
+            font-size: 16px;
+            transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+        }
+
+        #searchInput:focus,
+        #searchInput:hover {
+            box-shadow: 0 0 10px orange;
+            border-color: darkorange;
+        }
+
+
+
+        .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+
+
+
+
+
+    </style>
+</head>
+
+<body>
+    <h1>Lista de Productos</h1>
+    <input type="text" id="searchInput" placeholder="Buscar producto...">
+    <button id="generarCatalogoBtn" class="generate-catalog-button">Generar Catálogo General</button>
+    <button id="generarCatalogoBtnCat" class="generate-catalog-buttonCat">Generar Catálogo General por
+        Categoria</button>
+
+    <!-- Agrega el modal para seleccionar la categoría -->
+    <div id="seleccionarCategoriaModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Seleccionar Categoría</h2>
+            <form id="seleccionarCategoriaForm">
+                <label for="categoria">Categoría:</label>
+                <select id="categoria" name="categoria">
+                    {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Generar Catálogo</button>
+            </form>
+        </div>
+    </div>
+
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Código</th>
+                <th>Categoría</th>
+                <th>Observaciones</th>
+                <th>Especificaciones</th>
+                <th>Imagen</th>
+            </tr>
+        </thead>
+        <tbody id="productTableBody">
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.descripcion }}</td>
+                <td>{{ producto.precio }}</td>
+                <td>{{ producto.codigo }}</td>
+                <td>{{ producto.categoria }}</td>
+                <td>{{ producto.observaciones }}</td>
+                <td>{{ producto.especificaciones }}</td>
+                <td>
+                    {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="product-image">
+                    {% else %}
+                    Sin imagen disponible
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+
+<a href="{% url 'inicio' %}" class="regresar-button">Regresar al Menú</a>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+
+
+
+
+
+    // Filtrar productos por nombre
+    $(document).ready(function () {
+        $("#searchInput").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#productTableBody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+
+    // Generar el catálogo general
+    $(document).ready(function () {
+        $("#generarCatalogoBtn").click(function () {
+            fetch("/generar_catalogo_pdf/") // Ruta a la vista que generará el PDF general
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    throw new Error("Error al generar el catálogo");
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "catalogo_productos.pdf"; // Nombre del archivo PDF
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        });
+    });
+
+    // Funciones para el modal de categorías y generación de catálogo por categoría
+    $(document).ready(function () {
+        // Abrir modal para seleccionar categoría
+        $("#generarCatalogoBtnCat").click(function () {
+            $("#seleccionarCategoriaModal").css("display", "block");
+        });
+
+        // Cerrar modal
+        $(".close").click(function () {
+            $("#seleccionarCategoriaModal").css("display", "none");
+        });
+
+        // Cargar categorías desde el servidor al cargar la página
+        function cargarCategorias() {
+            $.ajax({
+                url: '/cargar_categorias/',  // Ruta a la vista que carga las categorías
+                type: 'GET',
+                success: function (data) {
+                    var categorias = JSON.parse(data);
+                    $('#categoria').empty();
+                    categorias.forEach(function (categoria) {
+                        $('#categoria').append(`<option value="${categoria.id}">${categoria.nombre}</option>`);
+                    });
+                },
+                error: function () {
+                    console.error('Error al cargar las categorías');
+                }
+            });
+        }
+
+        cargarCategorias(); // Llamar a la función para cargar las categorías al cargar la página
+
+        // Enviar formulario para generar catálogo por categoría
+        $("#seleccionarCategoriaForm").submit(function (event) {
+            event.preventDefault();
+            var categoriaId = $("#categoria").val();
+
+            fetch(`/generar_catalogo_pdf_por_categoria/${categoriaId}/`) // Ruta a la vista que generará el PDF por categoría
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    throw new Error("Error al generar el catálogo por categoría");
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `catalogo_productos_categoria_${categoriaId}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    $("#seleccionarCategoriaModal").css("display", "none"); // Cerrar modal después de descargar PDF
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        });
+    });
+
+    </script>
+</body>
+
+</html>

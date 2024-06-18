@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Emitir Reporte de Ventas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="date"],
+        input[type="text"] {
+            padding: 8px;
+            width: calc(50% - 10px);
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .btn-submit {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-submit:hover {
+            background-color: darkorange;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .alert {
+            padding: 15px;
+            background-color: #f44336;
+            color: white;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .print-only {
+            display: none;
+        }
+
+        @media print {
+            .print-only {
+                display: block !important;
+            }
+
+            .non-printable {
+                display: none;
+            }
+        }
+
+
+        .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Emitir Reporte de Ventas</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="fecha_desde">Emitir reporte de ventas desde:</label>
+                <input type="date" id="fecha_desde" name="fecha_desde" required>
+            </div>
+            <div class="form-group">
+                <label for="fecha_hasta">hasta:</label>
+                <input type="date" id="fecha_hasta" name="fecha_hasta" required>
+            </div>
+            <button type="submit" class="btn-submit">Generar Reporte</button>
+            <button type="button" class="btn-submit btn-imprimir non-printable"
+                onclick="window.print()">Imprimir</button>
+            <button type="button" class="btn-submit non-printable" onclick="descargarExcel()">Descargar Excel</button>
+        </form>
+
+        {% if ventas %}
+        <h2>Reporte de Ventas</h2>
+        <input type="text" id="searchInput" placeholder="Buscar en la tabla...">
+        <table id="ventasTable">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Número de Venta</th>
+                    <th>Monto</th>
+                    <th>Tipo de Operación</th>
+                    <th>Usuario</th>
+                    <th>Nombre del Cliente</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venta in ventas %}
+                <tr>
+                    <td>{{ venta.fecha }}</td>
+                    <td>{{ venta.id }}</td>
+                    <td>{{ venta.total }}</td>
+                    <td>{{ venta.tipo_operacion }}</td>
+                    <td>{{ venta.vendedor }}</td>
+                    <td>{{ venta.cliente.nombre }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No se encontraron registros de venta en el tiempo seleccionado.</p>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'inicio' %}" class="regresar-button">Regresar al Menú</a>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function descargarExcel() {
+            var wb = XLSX.utils.book_new();
+            wb.Props = {
+                Title: "Reporte de Ventas",
+                Subject: "Reporte",
+                Author: "TuNombre",
+                CreatedDate: new Date()
+            };
+            wb.SheetNames.push("Reporte");
+
+            var ws_data = [['Fecha', 'Número de Venta', 'Monto', 'Tipo de Operación', 'Usuario', 'Nombre del Cliente']];
+            var table = document.querySelector('table tbody');
+            var rows = table.querySelectorAll('tr');
+            rows.forEach((row) => {
+                var cells = row.querySelectorAll('td');
+                var rowData = [];
+                cells.forEach((cell) => {
+                    rowData.push(cell.textContent);
+                });
+                ws_data.push(rowData);
+            });
+
+            var ws = XLSX.utils.aoa_to_sheet(ws_data);
+            wb.Sheets["Reporte"] = ws;
+
+            var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+            function s2ab(s) {
+                var buf = new ArrayBuffer(s.length);
+                var view = new Uint8Array(buf);
+                for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                return buf;
+            }
+
+            saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), 'Reporte_Ventas.xlsx');
+        }
+
+        $(document).ready(function () {
+            $("#searchInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#ventasTable tbody tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

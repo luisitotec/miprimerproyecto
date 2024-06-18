@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Clientes</title>
+
+    <style>
+       /* Estilos adicionales para la tabla */
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos para el campo de búsqueda */
+        #txt-buscar-cliente {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        /* Estilos para la tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #ff8800;
+            color: white;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Estilos para el botón Seleccionar */
+        .btn-seleccionar {
+            padding: 8px 16px;
+            background-color: #ff8800;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-seleccionar:hover {
+            background-color: #ffaa33;
+        }
+
+
+
+         .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Lista de Clientes</h1>
+        <!-- Campo de búsqueda -->
+        <input type="text" id="txt-buscar-cliente" placeholder="Buscar cliente...">
+        <br>
+        <br>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Documento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    <td>{{ cliente.nombre }}</td>
+                    <td>{{ cliente.direccion }}</td>
+                    <td>{{ cliente.telefono }}</td>
+                    <td>{{ cliente.email }}</td>
+                    <td>{{ cliente.documentocliente }}</td>
+                    <td><button class="btn-seleccionar" data-nombre="{{ cliente.nombre }}"
+                            data-documento="{{ cliente.documentocliente }}"
+                            data-direccion="{{ cliente.direccion }}">Seleccionar</button></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No hay clientes registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <br>
+
+        <a href="{% url 'inicio' %}" class="regresar-button">Regresar al Menú</a>
+    </div>
+
+    <!-- Script jQuery para filtrar clientes -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#txt-buscar-cliente').on('keyup', function () {
+                var searchText = $(this).val().toLowerCase();
+                $('tbody tr').each(function () {
+                    var nombre = $(this).find('td:eq(0)').text().toLowerCase();
+                    var direccion = $(this).find('td:eq(1)').text().toLowerCase();
+                    var telefono = $(this).find('td:eq(2)').text().toLowerCase();
+                    var email = $(this).find('td:eq(3)').text().toLowerCase();
+                    var documento = $(this).find('td:eq(4)').text().toLowerCase();
+                    var match = nombre.indexOf(searchText) !== -1 || direccion.indexOf(searchText) !== -1 ||
+                        telefono.indexOf(searchText) !== -1 || email.indexOf(searchText) !== -1 || documento.indexOf(searchText) !== -1;
+                    $(this).toggle(match);
+                });
+            });
+        });
+
+         // Evento para seleccionar un cliente y pasar los datos a venta-masiva
+            $('.btn-seleccionar').click(function () {
+                var nombre = $(this).data('nombre');
+                var documento = $(this).data('documento');
+                var direccion = $(this).data('direccion');
+
+                // Almacenar los datos del cliente seleccionado en localStorage
+                localStorage.setItem('nombreCliente', nombre);
+                localStorage.setItem('documentoCliente', documento);
+                localStorage.setItem('direccionCliente', direccion);
+
+                // Redirigir a la página venta-masiva/
+                window.location.href = '/venta-masiva/';
+            });
+    
+
+            
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,163 @@
+<!-- trazabilidad_series.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Trazabilidad de Series</title>
+    <style>
+body {
+            font-family: 'Tahoma', sans-serif; /* Fuente general */
+        }
+
+        h1 {
+            color: orange;
+        }
+
+        /* Estilos para el formulario */
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid orange; /* Borde inicial naranja */
+            border-radius: 10px; /* Bordes redondos */
+            transition: border-color 0.3s, box-shadow 0.3s; /* Transición para el color del borde y sombra */
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #ff8c00; /* Cambio de color al enfocar */
+            box-shadow: 0 0 10px #ff8c00; /* Sombra brillante naranja */
+        }
+
+        input[type="text"]::placeholder {
+            color: #ccc; /* Color del placeholder */
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: orange;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s; /* Transición para el color de fondo */
+        }
+
+        button[type="submit"]:hover {
+            background-color: #ff8c00; /* Cambio de color al pasar el mouse */
+        }
+
+        /* Estilos para la tabla y contenido */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        table th,
+        table td {
+            border: 1px solid orange; /* Borde de color naranja */
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: orange; /* Fondo del encabezado naranja */
+            color: white; /* Letra blanca en el encabezado */
+        }
+
+        .content p {
+            margin-bottom: 10px;
+        }
+
+
+        .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Trazabilidad de Series</h1>
+    <form action="{% url 'trazabilidad_series' %}" method="GET">
+        <label for="serie">Número de Serie:</label>
+        <input type="text" id="serie" name="q" placeholder="Ingrese número de serie">
+        <button type="submit">Buscar</button>
+    </form>
+
+    {% if venta_asociada %}
+    <div>
+    <p>La serie {{ serie }} fue vendida en la factura número {{ venta_asociada.id }}.</p>
+    <p id="fecha_venta">Fecha de venta: {{ venta_asociada.fecha_venta }}</p>
+    <p>Cliente: {{ venta_asociada.cliente.nombre }}</p>
+    <p>Dirección: {{ venta_asociada.direccioncliente }}</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detalle in detalles_venta %}
+                <tr>
+                    <td>{{ detalle.producto.nombre }}</td>
+                    <td>{{ detalle.cantidad }}</td>
+                    <td>{{ detalle.precio_unitario }}</td>
+                    <td>{{ detalle.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <p>{{ error }}</p>
+    {% endif %}
+<a href="{% url 'inicio' %}" class="regresar-button">Regresar al Menú</a>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const fechaVenta = new Date('{{ venta_asociada.fecha|date:"Y-m-d" }}');
+            const fechaSpan = document.getElementById('fecha_venta');
+            const opcionesFecha = { day: 'numeric', month: 'short', year: 'numeric' };
+            fechaSpan.textContent = fechaVenta.toLocaleDateString('es-ES', opcionesFecha);
+        });
+    </script>
+
+
+
+
+
+</body>
+
+</html>

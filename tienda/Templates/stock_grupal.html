@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Grupal</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid orange;
+        }
+
+        th {
+            background-color: orange;
+            color: white;
+        }
+
+        th:hover {
+            background-color: darkorange;
+        }
+
+        .download-button,
+        .print-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: orange;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .download-button:hover,
+        .print-button:hover {
+            background-color: darkorange;
+        }
+
+        .search-input {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        
+        .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+    <h1>Stock Grupal de Productos</h1>
+    <input type="text" id="search-input" class="search-input" placeholder="Buscar...">
+    <button id="export-excel-button" class="download-button">Descargar en Excel</button>
+    <button id="print-pdf-button" class="print-button">Imprimir en PDF</button>
+    <br><br>
+
+    <table id="table-to-export">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Código</th>
+                <th>Precio</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.codigo }}</td>
+                <td>{{ producto.precio }}</td>
+                <td>{{ producto.stock }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'inicio' %}" class="regresar-button">Regresar al Menú</a>
+
+    <script>
+        $(document).ready(function () {
+            $("#search-input").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#table-to-export tbody tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+
+            // Función para exportar a Excel
+            function exportToExcel() {
+                var dataType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+                var tableSelect = document.getElementById('table-to-export');
+                var ws = XLSX.utils.table_to_sheet(tableSelect);
+                var wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "StockGrupal");
+
+                var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+                function s2ab(s) {
+                    var buf = new ArrayBuffer(s.length);
+                    var view = new Uint8Array(buf);
+                    for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                    return buf;
+                }
+
+                var blob = new Blob([s2ab(wbout)], { type: dataType });
+
+                if (navigator.msSaveBlob) { // IE 10+
+                    navigator.msSaveBlob(blob, 'StockGrupal.xlsx');
+                } else {
+                    var downloadLink = document.createElement("a");
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = 'StockGrupal.xlsx';
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                }
+            }
+
+            // Asociamos la función exportToExcel al botón de exportar a Excel
+            document.getElementById('export-excel-button').addEventListener('click', exportToExcel);
+
+            // Función para imprimir en PDF usando html2pdf.js
+            function printTableToPDF() {
+                var element = document.getElementById('table-to-export');
+
+                html2pdf().set({
+                    margin: 1,
+                    filename: 'tabla_productos.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { dpi: 192, letterRendering: true },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                }).from(element).save();
+            }
+
+            // Asociamos la función printTableToPDF al botón de imprimir en PDF
+            document.getElementById('print-pdf-button').addEventListener('click', printTableToPDF);
+        });
+    </script>
+</body>
+
+</html>

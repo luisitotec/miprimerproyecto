@@ -1,0 +1,59 @@
+<!-- crear_factura.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Factura de Venta #{{ venta.id }}</title>
+    <style>
+        /* Estilos CSS aquí */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Factura de Venta #{{ venta.id }}</h1>
+        </div>
+
+        <div class="content">
+            <div class="info">
+                <p><strong>Fecha:</strong> {{ venta.fecha }}</p>
+                <p><strong>Total:</strong> {{ venta.total }}</p>
+                <!-- Otros detalles de la venta según sea necesario -->
+            </div>
+
+            <h2>Detalles de Productos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Descuento</th>
+                        <th>Impuesto</th>
+                        <!-- Otros encabezados según necesites -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in detalles %}
+                    <tr>
+                        <td>{{ detalle.producto.nombre }}</td>
+                        <td>{{ detalle.cantidad }}</td>
+                        <td>{{ detalle.precio_unitario }}</td>
+                        <td>{{ detalle.descuento }}</td>
+                        <td>{{ detalle.impuesto }}</td>
+                        <!-- Otros campos del detalle de venta -->
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p><strong>Total:</strong> {{ venta.total }}</p>
+            <!-- Otros cálculos o información de la factura -->
+        </div>
+    </div>
+</body>
+
+</html>

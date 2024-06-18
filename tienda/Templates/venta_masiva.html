@@ -1,0 +1,913 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title> Venta Masiva</title>
+    <script>
+        // Hacer que el token CSRF esté disponible en JavaScript
+        var csrftoken = '{{ csrf_token }}';
+    </script>
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <style>
+        /* Estilos generales */
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 20px;
+            /* Ajusta el margen según sea necesario */
+        }
+
+        form {
+            width: 400px;
+            background-color: #FF8C00;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        form label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        form input[type="text"],
+        form input[type="email"],
+        form textarea,
+        form select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #f7a306;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        form input[type="submit"] {
+            background-color: #4CAF50;
+            color: rgb(235, 125, 0);
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        button#btn-facturar {
+            background-color: orange;
+            /* Fondo naranja */
+            color: white;
+            /* Letra blanca */
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            /* Bordes redondos */
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button#btn-facturar:hover {
+            background-color: #ff8000;
+            /* Color más claro al pasar el mouse */
+        }
+
+
+
+
+      .panel-venta {
+    background-color: orange; /* Fondo naranja */
+    padding: 20px;
+    border-radius: 10px; /* Bordes redondos */
+    box-shadow: 0 0 10px rgba(255, 165, 0, 0.5); /* Sombra naranja */
+    width: 350px; /* Ajusta el ancho según sea necesario */
+    position: absolute; /* Posición absoluta */
+    top: 20px; /* Ajusta la posición desde la parte superior */
+    right: calc(20% + -20px - 5cm); /* Mover 5 cm a la izquierda */
+    z-index: 1000; /* Z-index alto para asegurarse de que esté por encima de otros elementos */
+}
+
+        .panel-venta input[type="number"] {
+            padding: 8px;
+            border: 2px solid orange;
+            /* Borde naranja */
+            border-radius: 5px;
+            /* Bordes redondos */
+            font-size: 16px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .panel-venta input[type="number"]:hover {
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.8);
+            /* Sombra más pronunciada al pasar el mouse */
+        }
+
+
+
+
+
+
+        form {
+            margin-bottom: 20px;
+            /* Margen inferior para separar el formulario del panel de venta */
+        }
+
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            position: relative;
+            border-radius: 10px;
+        }
+
+        /* Estilos para el botón de cerrar (la "X") */
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+        }
+
+
+
+
+        .modal-header input {
+            float: right;
+            margin-bottom: 10px;
+        }
+
+
+        button#btn-invocar-cliente {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button#btn-invocar-cliente:hover {
+            background-color: #ff8000;
+            /* Color más claro al pasar el mouse */
+        }
+
+        button#btn-agregar {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button#btn-agregar:hover {
+            background-color: #ff8000;
+            /* Color más claro al pasar el mouse */
+        }
+
+
+
+
+
+         .regresar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8800;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .regresar-button:hover {
+            background-color: #ffaa33;
+        }
+        input#cantidad {
+            width: 200px;
+            /* Ajusta el ancho según tus necesidades */
+            padding: 10px;
+            border: 2px solid orange;
+            /* Borde naranja */
+            border-radius: 10px;
+            /* Bordes redondos */
+            box-shadow: 0 0 10px orange;
+            /* Sombra naranja */
+            font-size: 16px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        input#cantidad:hover {
+            box-shadow: 0 0 15px orange;
+            /* Sombra más pronunciada al pasar el mouse */
+        }
+
+        input#autocomplete-productos {
+            width: 300px;
+            /* Ajusta el ancho según tus necesidades */
+            padding: 10px;
+            border: 2px solid orange;
+            /* Borde naranja */
+            border-radius: 10px;
+            /* Bordes redondos */
+            box-shadow: 0 0 10px orange;
+            /* Sombra naranja */
+            font-size: 16px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        input#autocomplete-productos:hover {
+            box-shadow: 0 0 15px orange;
+            /* Sombra más pronunciada al pasar el mouse */
+        }
+
+        table#tabla-productos {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            /* Ajusta el margen superior según sea necesario */
+        }
+
+        table#tabla-productos th {
+            background-color: orange;
+            /* Fondo naranja para los encabezados */
+            color: white;
+            /* Letra blanca para los encabezados */
+            padding: 10px;
+            text-align: left;
+            border-radius: 10px 10px 0 0;
+            /* Bordes redondos solo en la parte superior */
+        }
+
+        table#tabla-productos td,
+        table#tabla-productos th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        table#tabla-productos td button.btn-eliminar {
+            background-color: #dc3545;
+            /* Color de fondo rojo para el botón de eliminar */
+            color: white;
+            /* Letra blanca para el botón de eliminar */
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        table#tabla-productos td button.btn-eliminar:hover {
+            background-color: #c82333;
+            /* Color de fondo rojo más oscuro al pasar el mouse */
+        }
+
+
+
+
+    /* Estilos CSS para el texto "Usuario" */
+        .username-container {
+            color: orange; /* Color naranja */
+            font-family: 'Tahoma', sans-serif; /* Fuente Tahoma */
+            animation: blink-animation 1s infinite; /* Animación de parpadeo */
+            text-align: left; /* Alinear a la izquierda */
+            margin-bottom: 20px; /* Margen inferior */
+        }
+
+        .username-container p {
+            font-size: 20px; /* Tamaño de fuente más grande */
+        }
+
+        @keyframes blink-animation {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+
+
+
+
+
+    </style>
+</head>
+
+<body>
+    <!-- Incluir jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <div class="container">
+        <div class="tabla-container">
+            <h1>Venta Masiva</h1>
+
+            <br>
+            <br>
+            <br>
+            <br>
+
+            <div class="username-container">
+                <p>Usuario: {{ usuario }}</p>
+            </div>
+
+
+
+
+            <button id="btn-invocar-cliente">Invocar cliente</button>
+            <input type="text" id="autocomplete-productos" name="productos" placeholder="Buscar productos...">
+            <p id="stock-disponible"></p>
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" id="cantidad" name="cantidad" min="1" required>
+            <button id="btn-agregar">Agregar</button>
+            <br>
+            <br>
+
+            <!-- Datos del cliente seleccionado -->
+            <div id="datos-cliente">
+                <!-- Aquí se mostrarán los datos del cliente seleccionado -->
+            </div>
+
+            <!-- Implementacion del form de clientes -->
+
+
+            <form method="post" id="miFormulario">
+                {% csrf_token %}
+                <label for="id_tipoOperacion">Tipo de Operación:</label>
+                <select id="id_tipoOperacion" name="tipoOperacion">
+                    <option value="FAC_CONSUMIDOR_FINAL">Factura Consumidor Final</option>
+                    <option value="CREDITO_FISCAL">Crédito Fiscal</option>
+                </select>
+                <br><br>
+                <label for="id_departamento">Departamento:</label>
+                <input type="text" id="id_departamento" name="departamento">
+                <br><br>
+                <label for="id_municipio">Municipio:</label>
+                <input type="text" id="id_municipio" name="municipio">
+                <br><br>
+                <label for="id_registro">Registro:</label>
+                <input type="text" id="id_registro" name="registro">
+                <br><br>
+                <label for="id_giro">Giro:</label>
+                <input type="text" id="id_giro" name="giro">
+                <br><br>
+                <label for="id_metodoPago">Método de Pago:</label>
+                <select id="id_metodoPago" name="metodoPago">
+                    <option value="EFECTIVO">Efectivo</option>
+                    <option value="TARJETA">Tarjeta de Crédito/Débito</option>
+                    <option value="DEPOSITO">Depósito Bancario</option>
+                    <option value="GIRO">Giro</option>
+                    <option value="BITCOIN">Bitcoin</option>
+                    <option value="PAYPAL">Paypal</option>
+                </select>
+                <br><br>
+                <label for="id_condicionesPago">Condiciones de Pago:</label>
+                <select id="id_condicionesPago" name="condicionesPago">
+                    <option value="CONTADO">Contado</option>
+                    <option value="CREDITO">Crédito</option>
+                </select>
+                <br><br>
+
+            </form>
+
+
+
+
+            <table id="tabla-productos">
+                <thead>
+                    <tr>
+                        <th>Cantidad</th>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Impuesto</th>
+                        <th>Ubicación</th>
+                        <th>Números de Serie</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in detalles_venta %}
+                    <tr>
+                        <td>{{ detalle.cantidad }}</td>
+                        <td>{{ detalle.codigo }}</td>
+                        <td>{{ detalle.nombre }}</td>
+                        <td>{{ detalle.precio_unitario }}</td>
+                        <td>{{ detalle.impuesto }}</td>
+                        <td>{{ detalle.ubicacion }}</td>
+                        <td>{{ detalle.series_vendidas|linebreaks }}</td>
+                        <!-- Esto añade saltos de línea en lugar de <br> -->
+                        <td><button class="btn-eliminar" onclick="eliminarProducto(this)">Eliminar</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <button id="btn-facturar">Facturar</button>
+
+        <!-- Modal de clientes -->
+        <div id="modal-clientes" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span> <!-- Botón de cerrar -->
+                {% include 'lista_clientes.html' %}
+            </div>
+        </div>
+
+
+
+
+        <div class="panel-venta">
+            <h2>Detalles de la Venta</h2>
+            <p>Total de Venta: <span id="total-venta">0.00</span></p>
+            <p>IVA: <span id="iva">0.00</span></p>
+            <p>Descuento: <input type="number" id="descuento" value="0" min="0" step="0.01">%</p>
+            <p>Total de Venta + IVA: <span id="total-con-descuento">0.00</span></p>
+        </div>
+    
+   
+    </div>
+    
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // AL INICIO, DESHABILITAR EL BOTÓN "FACTURAR"
+            $('#btn-facturar').prop('disabled', true);
+
+            // Función para inicializar el Autocomplete de productos
+            $('#autocomplete-productos').autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/autocomplete/productos/',
+                        dataType: 'json',
+                        data: {
+                            term: request.term
+                        },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.label,
+                                    value: item.value,
+                                    stock: item.stock,
+                                }
+                            }));
+                        }
+                    });
+                },
+                minLength: 1,
+                select: function (event, ui) {
+                    // Mostrar el stock disponible y establecer el máximo de cantidad
+                    $('#stock-disponible').text(`Stock disponible: ${ui.item.stock}`);
+                    $('#cantidad').attr('max', ui.item.stock);
+                }
+            });
+
+
+            /////////////////////////////////////////////////////
+       $(document).ready(function () {
+                // Función para verificar si la tabla tiene filas en el tbody
+                function verificarTabla() {
+                    var rowCount = $('#tabla-productos tbody tr').length;
+                    if (rowCount > 0) {
+                        $('#btn-facturar').prop('disabled', false);
+                    } else {
+                        $('#btn-facturar').prop('disabled', true);
+                    }
+                }
+
+                // Verificar inicialmente al cargar la página
+                verificarTabla();
+
+                // Escuchar cambios en la tabla (si se agregan o eliminan filas dinámicamente)
+                $('#tabla-productos').on('DOMSubtreeModified', function () {
+                    verificarTabla();
+                });
+            });
+
+
+
+
+
+
+
+
+            $('#btn-agregar').click(function () {
+                agregarProducto();
+                //$('#btn-facturar').prop('disabled', false);
+
+            });
+
+            $('#cantidad').keypress(function (event) {
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if (keycode == '13') {
+                    agregarProducto();
+                }
+            });
+
+
+
+
+
+
+            function agregarProducto() {
+
+
+
+
+                var codigo = $('#autocomplete-productos').val();
+                var cantidad = parseInt($('#cantidad').val());
+
+                if (!codigo || isNaN(cantidad) || cantidad <= 0) {
+                    alert('Ingrese un producto válido y una cantidad mayor a cero.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/detalle_producto/' + codigo + '/',
+                    success: function (data) {
+                        console.log('Datos recibidos del servidor:', data);
+
+                        var filaExistente = $('#tabla-productos tbody').find(`tr[data-codigo="${codigo}"]`);
+
+                        if (filaExistente.length > 0) {
+                            // Si la fila ya existe, actualizar la cantidad y las series
+                            var cantidadExistente = parseInt(filaExistente.find('.cantidad').text());
+                            var nuevaCantidad = cantidadExistente + cantidad;
+
+                            // Limitar la cantidad a la existencia disponible
+                            if (nuevaCantidad > data.existencias.length) {
+                                nuevaCantidad = data.existencias.length;
+                                alert('No hay suficientes existencias para agregar tantas unidades.');
+                            }
+
+                            filaExistente.find('.cantidad').text(nuevaCantidad);
+
+                            // Actualizar números de serie con saltos de línea
+                            var numerosSerieExistente = filaExistente.find('.numeros-serie');
+                            var seriesNuevas = data.existencias.slice(cantidadExistente, nuevaCantidad)
+                                .map(existencia => existencia.numeros_serie)
+                                .join('<br>');
+
+                            numerosSerieExistente.html(seriesNuevas);
+
+
+                            // Actualizar el impuesto (IVA) en la fila existente
+                            var precioUnitario = parseFloat(filaExistente.find('.precio').text());
+                            var impuesto = calcularIVA(nuevaCantidad, precioUnitario);
+                            filaExistente.find('.impuesto').text(impuesto.toFixed(2)); // Asegurar 2 decimales
+
+
+
+
+                        } else {
+                            // Si no existe, crear una nueva fila
+                            var fila = `
+          <tr data-codigo="${codigo}">
+            <td class="cantidad">${cantidad}</td>
+            <td>${codigo}</td>
+            <td>${data.nombre}</td>
+            <td class="precio">${data.precio}</td>
+            <td class="impuesto">${calcularIVA(cantidad, data.precio).toFixed(2)}</td>
+            <td class="ubicacion">${data.existencias[0].ubicacion}</td>
+            <td class="numeros-serie">
+              ${data.existencias.slice(0, cantidad).map(existencia => existencia.numeros_serie).join('<br>')}
+            </td>
+            <td><button class="btn-eliminar" onclick="eliminarProducto(this)">Eliminar</button></td>
+          </tr>
+        `;
+                            $('tbody').append(fila);
+                        }
+
+                        actualizarTotales();
+                    },
+                    error: function () {
+                        alert('Error al obtener los detalles del producto.');
+                    }
+                });
+
+                // Limpiar el campo de cantidad después de agregar el producto
+                $('#cantidad').val('');
+            }
+
+
+
+
+            // Función para calcular el IVA basado en la cantidad y el precio unitario
+            function calcularIVA(cantidad, precio) {
+                var subtotal = cantidad * precio; // Calculamos el subtotal multiplicando la cantidad por el precio
+                var iva = subtotal * 0.13; // Calculamos el IVA como el 13% del subtotal
+                return iva; // Devolvemos el valor del IVA
+            }
+            // Función para eliminar un producto de la tabla
+            window.eliminarProducto = function (button) {
+                $(button).closest('tr').remove();
+                actualizarTotales();
+            };
+
+            // Evento input del campo Descuento
+            $('#descuento').on('input', function () {
+                actualizarTotales();
+            });
+
+            // Función para actualizar los totales de la venta
+            function actualizarTotales() {
+                let totalVenta = 0;
+                let totalIVA = 0;
+
+                $('#tabla-productos tbody tr').each(function () {
+                    let precio = parseFloat($(this).find('.precio').text()) || 0;
+                    let impuesto = parseFloat($(this).find('.impuesto').text()) || 0;
+
+                    totalVenta += precio;
+                    totalIVA += impuesto; // Sumamos el IVA
+
+                });
+
+                let descuento = parseFloat($('#descuento').val()) || 0;
+                let totalConDescuento = totalIVA + totalVenta - (totalVenta * (descuento / 100));
+
+                // Actualizar los elementos en el HTML con los totales calculados
+                $('#total-venta').text(totalVenta.toFixed(2));
+                $('#iva').text(totalIVA.toFixed(2));
+                $('#total-con-descuento').text(totalConDescuento.toFixed(2));
+            }
+        });
+
+
+        $(document).ready(function () {
+
+            // Cuando se hace clic en el botón "Invocar cliente"
+            $('#btn-invocar-cliente').click(function () {
+                $.ajax({
+                    url: '/lista_clientes/',  // Reemplaza '/ruta/lista_clientes/' por la URL correcta
+                    type: 'GET',
+                    dataType: 'html',
+                    success: function (data) {
+                        $('#modal-clientes .modal-content').html(data);  // Inserta el contenido en el modal
+                        $('#modal-clientes').show();  // Muestra el modal
+                    },
+                    error: function () {
+                        alert('Error al cargar la lista de clientes.');
+                    }
+                });
+            });
+
+            // Evento para cerrar el modal
+            $('#btn-cerrar-modal').click(function () {
+                $('#modal-clientes').hide();
+            });
+
+            // Cerrar el modal si se hace clic fuera de él
+            $(window).click(function (event) {
+                if (event.target == $('#modal-clientes')[0]) {
+                    $('#modal-clientes').hide();
+                }
+            });
+
+        });
+
+
+        // RECEPCION DE DATOS /// Recibir datos del cliente seleccionado desde localStorage
+        $(document).ready(function () {
+            // Obtener fecha actual
+            const fechaActual = new Date().toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+
+            // Recibir datos del cliente seleccionado desde localStorage
+            const nombreCliente = localStorage.getItem('nombreCliente');
+            const documentoCliente = localStorage.getItem('documentoCliente');
+            const direccionCliente = localStorage.getItem('direccionCliente');
+
+            // Mostrar los datos del cliente seleccionado
+            if (nombreCliente && documentoCliente && direccionCliente) {
+
+
+
+                $('#datos-cliente').html(`
+
+                    
+
+                    <p><strong>Fecha:</strong> ${fechaActual}</p>
+                    <p><strong>Cliente:</strong> ${nombreCliente}</p>
+                    <p><strong>Documento:</strong> ${documentoCliente}</p>
+                    <p><strong>Dirección:</strong> ${direccionCliente}</p>
+                    
+                               
+                `);
+
+                // Limpiar los datos del cliente seleccionado de localStorage
+                localStorage.removeItem('nombreCliente');
+                localStorage.removeItem('documentoCliente');
+                localStorage.removeItem('direccionCliente');
+
+
+            }
+        });
+
+        //Implementacion del form de cabecera
+
+
+        //// ENVIO DE LOS DATOS AL SERVIDOR ///////////
+
+        $(document).ready(function () {
+            // Función para obtener el token CSRF desde las cookies
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Obtener el token CSRF
+            const csrftoken = getCookie('csrftoken');
+
+            // Función para enviar la venta masiva
+            //NIVEL DE LA CABECERA //////////////////////////////////
+            function enviarVentaMasiva() {
+                // Capturar datos estáticos de la cabecera
+                var fechaActual = new Date().toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+
+                var cliente_nombre = $('#datos-cliente p:nth-child(2)').text().split(': ')[1]?.trim() || '';
+                var documentoCliente = $('#datos-cliente p:nth-child(3)').text().split(': ')[1]?.trim() || '';
+                var direccionCliente = $('#datos-cliente p:nth-child(4)').text().split(': ')[1]?.trim() || '';
+                //var condicionesPago = $('#condiciones-pago').val();
+                //var metodo_pago = $('#forma-pago').val();
+                var tipoOperacionElement = document.getElementById('id_tipoOperacion'); // Aquí obtienes el campo tipo_operacion
+                const departamentoElement = document.getElementById('id_departamento');
+                const municipioElement = document.getElementById('id_municipio');
+                const registroElement = document.getElementById('id_registro');
+                const giroElement = document.getElementById('id_giro');
+                const metodo_pagoElement = document.getElementById('id_metodoPago')
+                const condicionesPagoElement = document.getElementById('id_condicionesPago')
+                
+
+               const usuario = $('#usuario').text().trim(); // Utilizamos .trim() para eliminar espacios en blanco alrededor del texto
+
+                // Verificar en la consola del navegador
+                console.log('Usuario capturado:', usuario);
+
+
+
+
+
+
+
+
+
+                //NIVEL DEL DETALLE /////////////////////////////////////////
+                var detalles_venta = [];
+                $('#tabla-productos tbody tr').each(function () {
+                    var cantidad = parseInt($(this).find('td:nth-child(1)').text().trim()); // Cantidad
+                    var producto_codigo = $(this).find('td:nth-child(2)').text().trim(); // Código del producto
+                    var producto_nombre = $(this).find('td:nth-child(3)').text().trim(); // Nombre del producto
+                    var precio_unitario = parseFloat($(this).find('td:nth-child(4)').text().trim()); // Precio unitario
+                    var impuesto = parseFloat($(this).find('td:nth-child(5)').text().trim()); // Impuesto
+                    var ubicacion = $(this).find('td:nth-child(6)').text().trim(); // Ubicación
+                    //var numeros_serie = $(this).find('td:nth-child(7)').text().trim(); // Números de serie
+                    var seriesHTML = $(this).find('td:nth-child(7)').html(); // Números de serie
+                    var numeros_serie = seriesHTML.split('<br>').map(serie => serie.trim()); // Separar series y eliminar espacios
+
+                    // Validar los datos obtenidos antes de agregar al detalle de venta
+                    if (!isNaN(cantidad) && !isNaN(precio_unitario) && !isNaN(impuesto)) {
+                        var detalle = {
+                            cantidad: cantidad,
+                            codigo: producto_codigo,
+                            nombre: producto_nombre,
+                            precio_unitario: precio_unitario,
+                            impuesto: impuesto,
+                            ubicacion: ubicacion,
+                            numeros_serie: numeros_serie
+                        };
+
+                        detalles_venta.push(detalle);
+                    }
+                });
+
+                // Construir objeto con todos los datos de la venta
+                var datosVenta = {
+                    fecha: fechaActual,
+                    cliente_nombre: cliente_nombre,
+                    documentoCliente: documentoCliente,
+                    direccionCliente: direccionCliente,
+
+                    tipo_operacion: tipoOperacionElement.value,
+                    departamento: departamentoElement.value,
+                    municipio: municipioElement.value,
+                    registro: registroElement.value,
+                    giro: giroElement.value,
+                    metodoPago: metodo_pagoElement.value,
+                    condicionesPago: condicionesPagoElement.value,
+                    estado: 'Completado',
+                    vendedor: usuario,  // Aquí agregamos el valor del usuario capturado
+
+
+                    //detalleAdicional: detalleAdicional,
+                    detalles_venta: detalles_venta
+                };
+
+                // Mostrar los datos de venta a enviar en la consola para verificar
+                console.log('Datos de venta a enviar:', datosVenta);
+
+                // Aquí va tu solicitud AJAX para enviar los datos al servidor
+                $.ajax({
+                    url: '/procesamiento_ventamasiva/',
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',  // Asegurarse de que el contenido sea JSON
+                    data: JSON.stringify(datosVenta), // Enviar el objeto como JSON
+                    beforeSend: function (xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function (response) {
+                        console.log('Venta procesada correctamente:', response);
+                        // Redirigir a la página de detalles de la venta utilizando el `venta_id`
+                        if (response.venta_id) {
+                            window.location.href = `/venta/${response.venta_id}/`;
+                        } else {
+                            console.error('Error en la respuesta del servidor:', response);
+                            alert('Error al procesar la venta. Por favor, intente nuevamente.');
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error al procesar la venta:', error);
+                        alert('Error al procesar la venta. Por favor, intente nuevamente.');
+                    }
+                });
+            }
+
+            // Evento click para el botón de facturar (si el botón ya existe)
+            $('#btn-facturar').on('click', function () {
+                enviarVentaMasiva(); // Llama a la función enviarVentaMasiva al hacer clic en el botón
+            });
+
+
+        });
+
+
+
+
+
+    </script>
+</body>
+
+</html>
