@@ -17,7 +17,8 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=False)
 
 # Configuración de ALLOWED_HOSTS usando la variable de entorno
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['demoplatebar.onrender.com'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['mydomain.com', 'renderproject.onrender.com'])
+
 
 # Application definition
 INSTALLED_APPS = [
