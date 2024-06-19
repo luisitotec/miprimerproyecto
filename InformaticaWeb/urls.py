@@ -54,7 +54,7 @@ from tienda.views import emitir_reporte_ventas
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('/', login, name='login'),
+    path('', login, name='login'),
     path('inicio/', inicio, name='inicio'),  # URL raíz que carga la página de inicio
     path('agregar_producto/', agregar_producto, name='agregar_producto'),
     path('lista_productos/', lista_productos, name='lista_productos'),
