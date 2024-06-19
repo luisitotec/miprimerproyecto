@@ -1,3 +1,4 @@
+
 from pathlib import Path
 import os
 import dj_database_url
@@ -16,7 +17,20 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
+
+import os
+from environ import Env
+
+env = Env()
+env.read_env()  # Lee las variables de entorno del archivo .env
+
+# Configuración de ALLOWED_HOSTS usando la variable de entorno
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['demoplatebar.onrender.com'])
+
+
+
+
+
 
 # Application definition
 
